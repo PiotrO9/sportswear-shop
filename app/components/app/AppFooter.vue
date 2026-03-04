@@ -60,12 +60,6 @@ const socialLinks = computed<SocialLink[]>(() => [
     },
 ]);
 
-const paymentIcons = [
-    'simple-icons:visa',
-    'simple-icons:mastercard',
-    'simple-icons:paypal',
-];
-
 function handleSocialKeyDown(event: KeyboardEvent, href: string) {
     if (!event) return;
 
@@ -82,7 +76,7 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
         role="contentinfo"
     >
         <div
-            class="text-secondary-600 dark:text-secondary-400 mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 text-sm"
+            class="text-secondary-600 dark:text-secondary-400 mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10 text-sm lg:px-8"
         >
             <div
                 class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5"
@@ -90,7 +84,7 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
                 <div class="lg:col-span-2">
                     <NuxtLink
                         :to="localePath('/')"
-                        class="text-secondary-900 dark:text-secondary-50 inline-block text-lg font-bold transition hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-lg"
+                        class="text-secondary-900 dark:text-secondary-50 inline-block text-xl font-bold transition hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-lg"
                         :aria-label="t('navGoToHome')"
                     >
                         Sportswear Shop
