@@ -8,30 +8,13 @@ interface NavLink {
 const route = useRoute();
 const { t } = useI18n();
 const localePath = useLocalePath();
-const { isAuthenticated } = useAuthSession();
 const { isDark, toggleDarkMode } = useDarkMode();
-const { handleLogout } = useLogout();
-
-const switchAriaLabel = computed(() =>
-    isDark.value ? t('commonSwitchToLight') : t('commonSwitchToDark'),
-);
 
 const navLinks = computed<NavLink[]>(() => [
-    { to: localePath('/'), label: t('navHome'), ariaLabel: t('navGoToHome') },
     {
         to: localePath('/design-system'),
         label: t('navDesignSystem'),
         ariaLabel: t('navGoToDesignSystem'),
-    },
-    {
-        to: localePath('/api-demo'),
-        label: t('navApiDemo'),
-        ariaLabel: t('navGoToApiDemo'),
-    },
-    {
-        to: localePath('/protected'),
-        label: t('navProtected'),
-        ariaLabel: t('navGoToProtected'),
     },
 ]);
 
@@ -42,14 +25,6 @@ function linkClass(to: string): string {
         return 'bg-secondary-100 text-secondary-900 dark:bg-secondary-800 dark:text-secondary-50';
 
     return 'text-secondary-700 hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-secondary-50';
-}
-
-function handleGoToLogin() {
-    navigateTo(localePath('/login'));
-}
-
-function handleToggleDarkMode() {
-    toggleDarkMode();
 }
 </script>
 

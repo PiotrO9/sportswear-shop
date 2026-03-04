@@ -14,13 +14,26 @@ useHead(() => ({
             type: 'image/svg+xml',
             href: '/favicon.svg',
         },
+        {
+            rel: 'preconnect',
+            href: 'https://fonts.googleapis.com',
+        },
+        {
+            rel: 'preconnect',
+            href: 'https://fonts.gstatic.com',
+            crossorigin: 'anonymous',
+        },
+        {
+            rel: 'stylesheet',
+            href: 'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap',
+        },
     ],
 }));
 </script>
 
 <template>
     <div
-        class="min-h-dvh bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-50"
+        class="min-h-dvh bg-white text-slate-950 font-sans dark:bg-slate-950 dark:text-slate-50"
     >
         <NuxtRouteAnnouncer />
         <NuxtLayout>
