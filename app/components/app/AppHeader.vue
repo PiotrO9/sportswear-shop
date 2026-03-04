@@ -87,31 +87,6 @@ function handleToggleDarkMode() {
 
             <div class="flex items-center gap-2">
                 <LanguageSwitcher />
-                <Switch
-                    :checked="isDark"
-                    :aria-label="switchAriaLabel"
-                    left-icon="heroicons:sun"
-                    right-icon="heroicons:moon"
-                    left-icon-class="text-warning-500"
-                    right-icon-class="text-secondary-600 dark:text-secondary-300"
-                    @update:checked="handleToggleDarkMode"
-                />
-                <Action
-                    v-if="isAuthenticated"
-                    variant="secondary"
-                    :aria-label="t('navLogOut')"
-                    @click="handleLogout"
-                >
-                    {{ t('navLogOut') }}
-                </Action>
-                <Action
-                    v-else
-                    variant="secondary"
-                    :aria-label="t('navGoToLogin')"
-                    @click="handleGoToLogin"
-                >
-                    {{ t('navLogIn') }}
-                </Action>
             </div>
         </div>
     </header>

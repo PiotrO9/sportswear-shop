@@ -1,43 +1,172 @@
 <script setup lang="ts">
+type AvailableLocale = 'en' | 'pl';
+
+interface LocaleOption {
+    code: AvailableLocale;
+    name: string;
+    flagSrc: string;
+}
+
+const FLAG_IMAGE_BY_LOCALE: Record<AvailableLocale, string> = {
+    en: '/images/us.webp',
+    pl: '/images/pl.webp',
+};
+
 const { locale, locales, setLocale } = useI18n();
 
-function handleLocaleChange(newLocale: string) {
-    if (locale.value === newLocale) return;
+const isOpen = ref(false);
+const triggerRef = ref<HTMLElement | null>(null);
+const dropdownRef = ref<HTMLElement | null>(null);
 
-    setLocale(newLocale);
+const localeOptions = computed<LocaleOption[]>(() =>
+    locales.value
+        .filter((loc) => loc.code in FLAG_IMAGE_BY_LOCALE)
+        .map((loc) => ({
+            code: loc.code as AvailableLocale,
+            name: loc.name ?? loc.code,
+            flagSrc: FLAG_IMAGE_BY_LOCALE[loc.code as AvailableLocale],
+        }))
+);
+
+const currentLocaleOption = computed(
+    () =>
+        localeOptions.value.find((opt) => opt.code === locale.value) ??
+        localeOptions.value[0]
+);
+
+const buttonAriaLabel = computed(() => {
+    const { t } = useI18n();
+
+    return `${t('commonSwitchLanguage')}: ${currentLocaleOption.value?.name ?? locale}`;
+});
+
+function handleToggle() {
+    isOpen.value = !isOpen.value;
 }
 
-function handleKeyDown(event: KeyboardEvent, localeCode: string) {
+function handleSelectLocale(option: LocaleOption) {
+    if (locale.value === option.code) {
+        isOpen.value = false;
+
+        return;
+    }
+
+    setLocale(option.code);
+    isOpen.value = false;
+}
+
+function handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        handleLocaleChange(localeCode);
+        handleToggle();
+    }
+
+    if (event.key === 'Escape') {
+        isOpen.value = false;
     }
 }
+
+function handleItemKeyDown(event: KeyboardEvent, option: LocaleOption) {
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        handleSelectLocale(option);
+    }
+}
+
+function handleClickOutside(event: MouseEvent) {
+    const target = event.target as Node;
+
+    if (
+        isOpen.value &&
+        triggerRef.value &&
+        !triggerRef.value.contains(target) &&
+        dropdownRef.value &&
+        !dropdownRef.value.contains(target)
+    ) {
+        isOpen.value = false;
+    }
+}
+
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
-    <div
-        class="border-secondary-200 bg-secondary-100 dark:border-secondary-700 dark:bg-secondary-800 flex items-center gap-0.5 rounded-lg border p-0.5"
-        role="group"
-        :aria-label="$t('commonSwitchLanguage')"
-    >
+    <div class="relative">
         <button
-            v-for="loc in locales"
-            :key="loc.code"
+            ref="triggerRef"
             type="button"
-            :aria-label="`${$t('commonSwitchLanguage')}: ${loc.name}`"
-            :aria-pressed="locale === loc.code"
-            :tabindex="locale === loc.code ? -1 : 0"
-            class="focus-visible:ring-primary-400 flex size-8 min-w-8 cursor-pointer items-center justify-center rounded-md text-center text-lg leading-none transition focus:outline-none focus-visible:ring-2"
-            :class="
-                locale === loc.code
-                    ? 'text-secondary-900 dark:bg-secondary-700 dark:text-secondary-50 bg-white shadow-sm'
-                    : 'text-secondary-500 hover:bg-secondary-200/50 dark:text-secondary-400 dark:hover:bg-secondary-700/50'
-            "
-            @click="handleLocaleChange(loc.code)"
-            @keydown="(e) => handleKeyDown(e, loc.code)"
+            :aria-label="buttonAriaLabel"
+            :aria-expanded="isOpen"
+            :aria-haspopup="true"
+            tabindex="0"
+            class="border-secondary-200 bg-secondary-50 hover:bg-secondary-100 focus-visible:ring-primary-400 dark:border-secondary-700 dark:bg-secondary-800 dark:hover:bg-secondary-700 flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-secondary-950"
+            @click="handleToggle"
+            @keydown="handleKeyDown"
         >
-            {{ loc.flag || loc.code }}
+            <img
+                v-if="currentLocaleOption"
+                :src="currentLocaleOption.flagSrc"
+                :alt="currentLocaleOption.name"
+                class="h-5 w-8 shrink-0 overflow-hidden rounded-sm object-cover"
+                width="32"
+                height="20"
+            />
+            <Icon
+                name="heroicons:chevron-down-20-solid"
+                class="size-4 shrink-0 text-secondary-600 transition-transform duration-200 dark:text-secondary-400"
+                :class="{ 'rotate-180': isOpen }"
+                aria-hidden="true"
+            />
         </button>
+
+        <Transition
+            enter-active-class="transition duration-150 ease-out"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition duration-100 ease-in"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+        >
+            <div
+                v-if="isOpen"
+                ref="dropdownRef"
+                role="menu"
+                :aria-label="$t('commonSwitchLanguage')"
+                class="border-secondary-200 bg-white dark:border-secondary-700 dark:bg-secondary-900 absolute right-0 top-full z-50 mt-2 flex min-w-48 flex-col gap-1 rounded-xl border px-2 py-2 shadow-lg"
+            >
+                <button
+                    v-for="option in localeOptions"
+                    :key="option.code"
+                    type="button"
+                    role="menuitem"
+                    :aria-label="option.name"
+                    :aria-current="locale === option.code"
+                    tabindex="0"
+                    class="flex w-full cursor-pointer items-center gap-4 rounded-lg px-3 py-2.5 text-left text-sm font-medium uppercase tracking-wide transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-inset"
+                    :class="
+                        locale === option.code
+                            ? 'bg-secondary-100 text-secondary-900 dark:bg-secondary-800 dark:text-secondary-50'
+                            : 'text-secondary-700 hover:bg-secondary-100 hover:text-secondary-900 dark:text-secondary-300 dark:hover:bg-secondary-800 dark:hover:text-secondary-50'
+                    "
+                    @click="handleSelectLocale(option)"
+                    @keydown="(e) => handleItemKeyDown(e, option)"
+                >
+                    <img
+                        :src="option.flagSrc"
+                        :alt="option.name"
+                        class="h-5 w-8 shrink-0 overflow-hidden rounded-sm object-cover"
+                        width="32"
+                        height="20"
+                    />
+                    <span class="flex-1">{{ option.name }}</span>
+                </button>
+            </div>
+        </Transition>
     </div>
 </template>
