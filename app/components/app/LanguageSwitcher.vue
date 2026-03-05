@@ -25,13 +25,13 @@ const localeOptions = computed<LocaleOption[]>(() =>
             code: loc.code as AvailableLocale,
             name: loc.name ?? loc.code,
             flagSrc: FLAG_IMAGE_BY_LOCALE[loc.code as AvailableLocale],
-        }))
+        })),
 );
 
 const currentLocaleOption = computed(
     () =>
         localeOptions.value.find((opt) => opt.code === locale.value) ??
-        localeOptions.value[0]
+        localeOptions.value[0],
 );
 
 const buttonAriaLabel = computed(() => {
@@ -105,7 +105,7 @@ onUnmounted(() => {
             :aria-expanded="isOpen"
             :aria-haspopup="true"
             tabindex="0"
-            class="border-secondary-200 bg-secondary-50 hover:bg-secondary-100 focus-visible:ring-primary-400 dark:border-secondary-700 dark:bg-secondary-800 dark:hover:bg-secondary-700 flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-secondary-950"
+            class="border-secondary-200 bg-secondary-50 hover:bg-secondary-100 focus-visible:ring-primary-400 dark:border-secondary-700 dark:bg-secondary-800 dark:hover:bg-secondary-700 dark:focus-visible:ring-offset-secondary-950 flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             @click="handleToggle"
             @keydown="handleKeyDown"
         >
@@ -119,7 +119,7 @@ onUnmounted(() => {
             />
             <Icon
                 name="heroicons:chevron-down-20-solid"
-                class="size-4 shrink-0 text-secondary-600 transition-transform duration-200 dark:text-secondary-400"
+                class="text-secondary-600 dark:text-secondary-400 size-4 shrink-0 transition-transform duration-200"
                 :class="{ 'rotate-180': isOpen }"
                 aria-hidden="true"
             />
@@ -138,7 +138,7 @@ onUnmounted(() => {
                 ref="dropdownRef"
                 role="menu"
                 :aria-label="$t('commonSwitchLanguage')"
-                class="border-secondary-200 bg-white dark:border-secondary-700 dark:bg-secondary-900 absolute right-0 top-full z-50 mt-2 flex min-w-48 flex-col gap-1 rounded-xl border px-2 py-2 shadow-lg"
+                class="border-secondary-200 dark:border-secondary-700 dark:bg-secondary-900 absolute top-full right-0 z-50 mt-2 flex min-w-48 flex-col gap-1 rounded-xl border bg-white px-2 py-2 shadow-lg"
             >
                 <button
                     v-for="option in localeOptions"
@@ -148,7 +148,7 @@ onUnmounted(() => {
                     :aria-label="option.name"
                     :aria-current="locale === option.code"
                     tabindex="0"
-                    class="flex w-full cursor-pointer items-center gap-4 rounded-lg px-3 py-2.5 text-left text-sm font-medium uppercase tracking-wide transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-inset"
+                    class="focus-visible:ring-primary-400 flex w-full cursor-pointer items-center gap-4 rounded-lg px-3 py-2.5 text-left text-sm font-medium tracking-wide uppercase transition focus:outline-none focus-visible:ring-2 focus-visible:ring-inset"
                     :class="
                         locale === option.code
                             ? 'bg-secondary-100 text-secondary-900 dark:bg-secondary-800 dark:text-secondary-50'

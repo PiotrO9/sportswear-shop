@@ -186,11 +186,7 @@ function handleLogoutClick() {
                         :is-disabled="!isFormValid || isLoading"
                         @click="handleLogin"
                     >
-                        {{
-                            isLoading
-                                ? t('loginLoggingIn')
-                                : t('navLogIn')
-                        }}
+                        {{ isLoading ? t('loginLoggingIn') : t('navLogIn') }}
                     </Action>
                     <Action
                         v-else

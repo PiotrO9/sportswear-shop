@@ -82,5 +82,15 @@
     "footerGoToYoutube": "Przejdź do YouTube",
     "footerGoToWhatsapp": "Przejdź do WhatsApp",
     "logoutTitle": "Wylogowano",
-    "logoutSeeYouLater": "Do zobaczenia, {name}!"
+    "logoutSeeYouLater": "Do zobaczenia, {name}!",
+    "errorPageNotFound": "Strona nie znaleziona",
+    "errorTitle": "Błąd ({statusCode})",
+    "errorSomethingWentWrong": "Coś poszło nie tak",
+    "error404Description": "Wygląda na to, że ta strona uciekła na trening. Wróć na stronę główną i kontynuuj zakupy.",
+    "errorDefaultDescription": "Spróbuj wrócić na stronę główną lub odśwież stronę.",
+    "errorGoHomeAria": "Wróć na stronę główną",
+    "errorTryAgain": "Spróbuj ponownie",
+    "errorTryAgainAria": "Spróbuj ponownie",
+    "errorViewNewArrivals": "Zobacz nowości w sklepie →",
+    "errorViewNewArrivalsAria": "Zobacz nowości w sklepie"
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 useSeoMeta({
-    description: 'Frontend starter template z Nuxt 4, Vue 3, TypeScript i TailwindCSS',
+    description:
+        'Frontend starter template z Nuxt 4, Vue 3, TypeScript i TailwindCSS',
     ogType: 'website',
 });
 
@@ -33,7 +34,7 @@ useHead(() => ({
 
 <template>
     <div
-        class="min-h-dvh bg-white text-slate-950 font-sans dark:bg-slate-950 dark:text-slate-50"
+        class="min-h-dvh bg-white font-sans text-slate-950 dark:bg-slate-950 dark:text-slate-50"
     >
         <NuxtRouteAnnouncer />
         <NuxtLayout>

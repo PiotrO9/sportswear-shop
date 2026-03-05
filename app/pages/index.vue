@@ -8,7 +8,5 @@ usePageMeta({
 </script>
 
 <template>
-    <div class="space-y-8">
-        
-    </div>
+    <div class="space-y-8"></div>
 </template>

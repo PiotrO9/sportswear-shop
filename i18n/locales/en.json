@@ -82,5 +82,15 @@
     "footerGoToYoutube": "Go to YouTube",
     "footerGoToWhatsapp": "Go to WhatsApp",
     "logoutTitle": "Logged out",
-    "logoutSeeYouLater": "See you later, {name}!"
+    "logoutSeeYouLater": "See you later, {name}!",
+    "errorPageNotFound": "Page not found",
+    "errorTitle": "Error ({statusCode})",
+    "errorSomethingWentWrong": "Something went wrong",
+    "error404Description": "Looks like this page went for a run. Head back to the home page and continue shopping.",
+    "errorDefaultDescription": "Try going back to the home page or refresh the page.",
+    "errorGoHomeAria": "Go back to home page",
+    "errorTryAgain": "Try again",
+    "errorTryAgainAria": "Try again",
+    "errorViewNewArrivals": "View new arrivals in shop →",
+    "errorViewNewArrivalsAria": "View new arrivals in shop"
 }

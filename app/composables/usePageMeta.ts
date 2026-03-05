@@ -1,6 +1,10 @@
 import { toValue } from 'vue';
 
-type MaybeRefOrGetter<T> = import('vue').Ref<T> | import('vue').ComputedRef<T> | (() => T) | T;
+type MaybeRefOrGetter<T> =
+    | import('vue').Ref<T>
+    | import('vue').ComputedRef<T>
+    | (() => T)
+    | T;
 
 export interface UsePageMetaOptions {
     /** Tytuł strony */
@@ -25,11 +29,15 @@ export function usePageMeta(options: UsePageMetaOptions): void {
 
     const fullTitle = computed(() => {
         const titleVal = typeof title === 'function' ? title() : toValue(title);
-        return titleVal ? `${titleVal} | ${DEFAULT_SITE_NAME}` : DEFAULT_SITE_NAME;
+        return titleVal
+            ? `${titleVal} | ${DEFAULT_SITE_NAME}`
+            : DEFAULT_SITE_NAME;
     });
 
     const descriptionVal = computed(() =>
-        typeof description === 'function' ? description() : toValue(description ?? ''),
+        typeof description === 'function'
+            ? description()
+            : toValue(description ?? ''),
     );
 
     const ogImageUrl = computed(() => {

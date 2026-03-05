@@ -65,7 +65,7 @@ const utilityLinks = computed<UtilityLink[]>(() => [
         label: t('footerHelpContact'),
         icon: 'heroicons:question-mark-circle',
         ariaLabel: t('footerHelpContact'),
-    }
+    },
 ]);
 
 function handleClose() {
@@ -153,16 +153,20 @@ onUnmounted(() => {
                 >
                     <aside
                         v-if="open"
-                        class="absolute right-0 top-0 flex h-full w-[min(320px,85vw)] flex-col bg-white shadow-xl dark:bg-secondary-900"
+                        class="dark:bg-secondary-900 absolute top-0 right-0 flex h-full w-[min(320px,85vw)] flex-col bg-white shadow-xl"
                     >
-                        <div class="flex items-center justify-end border-b border-secondary-200 px-4 py-4 dark:border-secondary-700">
+                        <div
+                            class="border-secondary-200 dark:border-secondary-700 flex items-center justify-end border-b px-4 py-4"
+                        >
                             <button
                                 type="button"
                                 tabindex="0"
                                 class="text-secondary-700 hover:bg-secondary-100 focus-visible:ring-primary-400 dark:text-secondary-300 dark:hover:bg-secondary-800 cursor-pointer rounded-lg p-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                                 :aria-label="t('navCloseMenu')"
                                 @click="handleClose"
-                                @keydown="(e) => isEnterOrSpaceKey(e) && handleClose()"
+                                @keydown="
+                                    (e) => isEnterOrSpaceKey(e) && handleClose()
+                                "
                             >
                                 <Icon
                                     name="heroicons:x-mark"
@@ -184,27 +188,27 @@ onUnmounted(() => {
                                     v-for="link in navLinks"
                                     :key="link.to"
                                     :to="link.to"
-                                    class="text-secondary-900 dark:text-secondary-50 flex items-center justify-between rounded-lg px-3 py-3 text-base font-medium transition hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                                    class="text-secondary-900 dark:text-secondary-50 hover:bg-secondary-100 dark:hover:bg-secondary-800 flex items-center justify-between rounded-lg px-3 py-3 text-base font-medium transition"
                                     :aria-label="link.ariaLabel"
                                 >
                                     {{ link.label }}
                                     <Icon
                                         name="heroicons:chevron-right"
-                                        class="size-5 text-secondary-400"
+                                        class="text-secondary-400 size-5"
                                         aria-hidden="true"
                                     />
                                 </NuxtLink>
                             </nav>
 
                             <nav
-                                class="mt-6 flex flex-col gap-2 border-t border-secondary-200 pt-6 dark:border-secondary-700"
+                                class="border-secondary-200 dark:border-secondary-700 mt-6 flex flex-col gap-2 border-t pt-6"
                                 :aria-label="t('footerHelp')"
                             >
                                 <NuxtLink
                                     v-for="util in utilityLinks"
                                     :key="util.to"
                                     :to="util.to"
-                                    class="text-secondary-700 dark:text-secondary-300 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition hover:bg-secondary-100 dark:hover:bg-secondary-800"
+                                    class="text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition"
                                     :aria-label="util.ariaLabel"
                                     @click="handleClose"
                                 >

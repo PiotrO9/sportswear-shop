@@ -78,48 +78,44 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
         <div
             class="text-secondary-600 dark:text-secondary-400 mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10 text-sm lg:px-8"
         >
-            <div
-                class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5"
-            >
+            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
                 <div class="lg:col-span-2">
                     <NuxtLink
                         :to="localePath('/')"
-                        class="text-secondary-900 dark:text-secondary-50 inline-block text-xl font-bold transition hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-lg"
+                        class="text-secondary-900 dark:text-secondary-50 hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-500 inline-block rounded-lg text-xl font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                         :aria-label="t('navGoToHome')"
                     >
                         Sportswear Shop
                     </NuxtLink>
                 </div>
 
-                <nav
-                    class="flex flex-col gap-3"
-                    :aria-label="t('footerShop')"
-                >
-                    <h3 class="text-secondary-900 dark:text-secondary-100 font-semibold">
+                <nav class="flex flex-col gap-3" :aria-label="t('footerShop')">
+                    <h3
+                        class="text-secondary-900 dark:text-secondary-100 font-semibold"
+                    >
                         {{ t('footerShop') }}
                     </h3>
                     <NuxtLink
                         v-for="link in shopLinks"
                         :key="link.to"
                         :to="link.to"
-                        class="transition hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded px-1 -mx-1"
+                        class="hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-500 -mx-1 rounded px-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     >
                         {{ link.label }}
                     </NuxtLink>
                 </nav>
 
-                <nav
-                    class="flex flex-col gap-3"
-                    :aria-label="t('footerHelp')"
-                >
-                    <h3 class="text-secondary-900 dark:text-secondary-100 font-semibold">
+                <nav class="flex flex-col gap-3" :aria-label="t('footerHelp')">
+                    <h3
+                        class="text-secondary-900 dark:text-secondary-100 font-semibold"
+                    >
                         {{ t('footerHelp') }}
                     </h3>
                     <NuxtLink
                         v-for="link in helpLinks"
                         :key="link.to"
                         :to="link.to"
-                        class="transition hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded px-1 -mx-1"
+                        class="hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-500 -mx-1 rounded px-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     >
                         {{ link.label }}
                     </NuxtLink>
@@ -129,14 +125,16 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
                     class="flex flex-col gap-3"
                     :aria-label="t('footerCompany')"
                 >
-                    <h3 class="text-secondary-900 dark:text-secondary-100 font-semibold">
+                    <h3
+                        class="text-secondary-900 dark:text-secondary-100 font-semibold"
+                    >
                         {{ t('footerCompany') }}
                     </h3>
                     <NuxtLink
                         v-for="link in companyLinks"
                         :key="link.to"
                         :to="link.to"
-                        class="transition hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded px-1 -mx-1"
+                        class="hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-500 -mx-1 rounded px-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     >
                         {{ link.label }}
                     </NuxtLink>
@@ -146,7 +144,9 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
             <div
                 class="border-secondary-200 dark:border-secondary-800 flex flex-col gap-4 border-t pt-8 sm:flex-row sm:items-center sm:justify-between"
             >
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+                <div
+                    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6"
+                >
                     <div class="flex items-center gap-4">
                         <div class="flex gap-3">
                             <a
@@ -155,11 +155,13 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
                                 :href="social.href"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded p-1"
+                                class="focus-visible:ring-primary-500 rounded p-1 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                                 :class="social.colorClass"
                                 :aria-label="social.ariaLabel"
                                 tabindex="0"
-                                @keydown="handleSocialKeyDown($event, social.href)"
+                                @keydown="
+                                    handleSocialKeyDown($event, social.href)
+                                "
                             >
                                 <Icon
                                     :name="social.icon"
@@ -170,7 +172,6 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
                             </a>
                         </div>
                     </div>
-                    
                 </div>
                 <p class="text-secondary-500 dark:text-secondary-500 text-xs">
                     {{ t('footerCopyright', { year: currentYear }) }}

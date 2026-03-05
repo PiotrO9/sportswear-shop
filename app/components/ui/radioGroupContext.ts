@@ -6,5 +6,6 @@ export interface RadioGroupContext {
     setValue: (value: string | number) => void;
 }
 
-export const RADIO_GROUP_INJECTION_KEY =
-    Symbol('RadioGroup') as InjectionKey<ComputedRef<RadioGroupContext>>;
+export const RADIO_GROUP_INJECTION_KEY = Symbol('RadioGroup') as InjectionKey<
+    ComputedRef<RadioGroupContext>
+>;

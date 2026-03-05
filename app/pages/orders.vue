@@ -8,7 +8,9 @@ usePageMeta({
 
 <template>
     <div class="py-8">
-        <h1 class="text-secondary-900 dark:text-secondary-50 text-2xl font-bold">
+        <h1
+            class="text-secondary-900 dark:text-secondary-50 text-2xl font-bold"
+        >
             {{ $t('navOrders') }}
         </h1>
     </div>

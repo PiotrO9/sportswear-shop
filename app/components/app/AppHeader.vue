@@ -73,7 +73,7 @@ function handleBurgerKeyDown(event: KeyboardEvent) {
 
 <template>
     <header
-        class="sticky top-0 z-40 border-b border-secondary-200 bg-white/95 backdrop-blur dark:border-secondary-800 dark:bg-secondary-950/95"
+        class="border-secondary-200 dark:border-secondary-800 dark:bg-secondary-950/95 sticky top-0 z-40 border-b bg-white/95 backdrop-blur"
     >
         <div
             class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-8"
@@ -81,7 +81,7 @@ function handleBurgerKeyDown(event: KeyboardEvent) {
             <div class="flex min-w-0 flex-1 items-center gap-4 lg:flex-initial">
                 <NuxtLink
                     :to="localePath('/')"
-                    class="text-secondary-900 dark:text-secondary-50 shrink-0 text-xl font-bold transition hover:text-primary-600 dark:hover:text-primary-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 rounded-lg"
+                    class="text-secondary-900 dark:text-secondary-50 hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-400 shrink-0 rounded-lg text-xl font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     :aria-label="t('navGoToHome')"
                 >
                     Sportswear Shop
@@ -109,7 +109,7 @@ function handleBurgerKeyDown(event: KeyboardEvent) {
 
                 <button
                     type="button"
-                    class="text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-secondary-50 lg:hidden cursor-pointer rounded-lg p-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2"
+                    class="text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-secondary-50 focus-visible:ring-primary-400 cursor-pointer rounded-lg p-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:hidden"
                     :aria-label="t('navOpenMenu')"
                     :aria-expanded="isBurgerOpen"
                     tabindex="0"
