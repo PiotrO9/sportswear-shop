@@ -88,11 +88,7 @@ export function useCreatorConfigurator() {
             Object.assign(config, saved.config);
         }
 
-        if (
-            saved &&
-            saved.stepIndex >= 0 &&
-            saved.stepIndex < steps.length
-        ) {
+        if (saved && saved.stepIndex >= 0 && saved.stepIndex < steps.length) {
             currentStepIndex.value = saved.stepIndex;
         }
     });
@@ -202,13 +198,9 @@ export function useCreatorConfigurator() {
 
     function handleReset(): void {
         currentStepIndex.value = 0;
-        config.productType = '';
-        config.material = '';
-        config.cut = '';
-        config.color = '';
-        config.size = '';
-        config.sleeveType = '';
-        config.neckline = '';
+        CONFIG_KEYS.forEach((key) => {
+            config[key] = '';
+        });
         clearSavedState();
     }
 
@@ -218,6 +210,10 @@ export function useCreatorConfigurator() {
 
     function handleConfirmReset(): void {
         handleReset();
+    }
+
+    function isOptionSelected(optionId: string): boolean {
+        return getCurrentValue() === optionId;
     }
 
     function handleKeyDown(event: KeyboardEvent, optionId: string): void {
@@ -271,5 +267,6 @@ export function useCreatorConfigurator() {
         handleKeyDown,
         getSummaryLabel,
         getSummaryOption,
+        isOptionSelected,
     };
 }
