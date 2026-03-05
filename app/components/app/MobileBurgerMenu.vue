@@ -53,6 +53,11 @@ const navLinks = computed<NavLink[]>(() => [
         ariaLabel: t('navGoToSport'),
     },
     {
+        to: localePath('/shop/creator'),
+        label: t('footerShopCreator'),
+        ariaLabel: t('navGoToCreator'),
+    },
+    {
         to: localePath('/design-system'),
         label: t('navDesignSystem'),
         ariaLabel: t('navGoToDesignSystem'),

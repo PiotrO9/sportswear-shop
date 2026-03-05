@@ -130,7 +130,7 @@ onMounted(() => {
                     <button
                         type="button"
                         tabindex="0"
-                        class="border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus-visible:ring-secondary-500 dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700 rounded-lg border bg-white px-4 py-2 text-sm font-medium transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                        class="border-secondary-300 text-secondary-700 hover:bg-secondary-50 focus-visible:ring-secondary-500 dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-300 dark:hover:bg-secondary-700 cursor-pointer rounded-lg border bg-white px-4 py-2 text-sm font-medium transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                         :aria-label="cancelText"
                         @click="handleCancel"
                         @keydown="
@@ -147,7 +147,7 @@ onMounted(() => {
                     <button
                         type="button"
                         tabindex="0"
-                        class="bg-danger-600 hover:bg-danger-700 focus-visible:ring-danger-500 dark:bg-danger-700 dark:hover:bg-danger-600 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                        class="bg-danger-600 hover:bg-danger-700 focus-visible:ring-danger-500 dark:bg-danger-700 dark:hover:bg-danger-600 cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                         :aria-label="confirmText"
                         @click="handleConfirm"
                         @keydown="
