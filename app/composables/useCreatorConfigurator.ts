@@ -74,24 +74,21 @@ function clearSavedState(): void {
 
 export function useCreatorConfigurator() {
     const { t } = useI18n();
-
     const steps = getCreatorSteps();
-    const currentStepIndex = ref(0);
+
+    const saved = !import.meta.server ? loadSavedState() : null;
+    const initialConfig: ConfiguratorState = saved?.config
+        ? { ...saved.config }
+        : { ...createInitialConfig() };
+    const initialStepIndex =
+        saved && saved.stepIndex >= 0 && saved.stepIndex < steps.length
+            ? saved.stepIndex
+            : 0;
+
+    const currentStepIndex = ref(initialStepIndex);
     const isResetModalOpen = ref(false);
     const validationError = ref<string>('');
-    const config = reactive<ConfiguratorState>({ ...createInitialConfig() });
-
-    onMounted(() => {
-        const saved = loadSavedState();
-
-        if (saved?.config) {
-            Object.assign(config, saved.config);
-        }
-
-        if (saved && saved.stepIndex >= 0 && saved.stepIndex < steps.length) {
-            currentStepIndex.value = saved.stepIndex;
-        }
-    });
+    const config = reactive<ConfiguratorState>({ ...initialConfig });
 
     watch(
         [config, currentStepIndex],

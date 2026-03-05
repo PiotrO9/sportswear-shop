@@ -99,6 +99,7 @@
     "creatorMetaDescription": "Create your dream sportswear – choose type, material, cut and color.",
     "creatorSubtitle": "Configure your dream outfit – step by step",
     "creatorAutoSaveHint": "Your choices are saved automatically and restored on your next visit.",
+    "creatorLoadingAria": "Loading creator",
     "creatorResetAria": "Reset creator",
     "creatorStepsAria": "Creator stages",
     "creatorStageAria": "Stage {n}: {title}",

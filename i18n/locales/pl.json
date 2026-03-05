@@ -99,6 +99,7 @@
     "creatorMetaDescription": "Stwórz swoje wymarzone ubranie sportowe – wybierz typ, materiał, krój i kolor.",
     "creatorSubtitle": "Skonfiguruj swoje wymarzone ubranie – krok po kroku",
     "creatorAutoSaveHint": "Twoje wybory są zapisywane automatycznie i przywracane przy kolejnej wizycie.",
+    "creatorLoadingAria": "Ładowanie kreatora",
     "creatorResetAria": "Zresetuj kreator",
     "creatorStepsAria": "Etapy kreatora",
     "creatorStageAria": "Etap {n}: {title}",
