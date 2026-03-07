@@ -175,7 +175,7 @@ function formatPrice(price: number): string {
 
             <aside
                 class="border-secondary-200 dark:border-secondary-800 dark:bg-secondary-900 hidden w-fit max-w-[360px] shrink-0 self-start rounded-lg border bg-white p-2 lg:block"
-                aria-label="Filtry produktów"
+                :aria-label="t('categoriesFiltersAria')"
             >
                 <CategoriesFiltersContent
                     v-model:filter-category="filterCategory"
@@ -209,7 +209,10 @@ function formatPrice(price: number): string {
                 />
             </CategoriesFiltersDrawer>
 
-            <section class="min-w-0 flex-1" aria-label="Lista produktów">
+            <section
+                class="min-w-0 flex-1"
+                :aria-label="t('categoriesProductsListAria')"
+            >
                 <p
                     class="text-secondary-600 dark:text-secondary-400 mb-4 text-sm"
                 >
@@ -267,7 +270,7 @@ function formatPrice(price: number): string {
                 <nav
                     v-if="filteredProducts.length > 0 && totalPages > 1"
                     class="mt-6 flex flex-wrap items-center justify-center gap-2"
-                    aria-label="Paginacja"
+                    :aria-label="t('categoriesPaginationAria')"
                 >
                     <button
                         type="button"
