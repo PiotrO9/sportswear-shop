@@ -1,0 +1,20 @@
+export type ProductCategory = 'men' | 'women' | 'kids' | 'sport';
+
+export type ProductSize = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL';
+
+export type ProductMaterial = 'cotton' | 'polyester' | 'blend' | 'lycra';
+
+export type ProductColor = 'black' | 'white' | 'grey' | 'navy' | 'red' | 'blue';
+
+export type ProductSort = 'price-asc' | 'price-desc' | 'name-asc';
+
+export interface Product {
+    id: string;
+    name: string;
+    price: number;
+    category: ProductCategory;
+    sizes: ProductSize[];
+    material: ProductMaterial;
+    colors: ProductColor[];
+    imageUrl?: string;
+}
