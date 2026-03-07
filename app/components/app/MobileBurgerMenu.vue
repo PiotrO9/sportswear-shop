@@ -28,29 +28,9 @@ const localePath = useLocalePath();
 
 const navLinks = computed<NavLink[]>(() => [
     {
-        to: localePath('/shop/new-arrivals'),
-        label: t('navNewArrivals'),
-        ariaLabel: t('navGoToNewArrivals'),
-    },
-    {
-        to: localePath('/shop/men'),
-        label: t('navMen'),
-        ariaLabel: t('navGoToMen'),
-    },
-    {
-        to: localePath('/shop/women'),
-        label: t('navWomen'),
-        ariaLabel: t('navGoToWomen'),
-    },
-    {
-        to: localePath('/shop/kids'),
-        label: t('navKids'),
-        ariaLabel: t('navGoToKids'),
-    },
-    {
-        to: localePath('/shop/sport'),
-        label: t('navSport'),
-        ariaLabel: t('navGoToSport'),
+        to: localePath('/shop/categories'),
+        label: t('footerShopCategories'),
+        ariaLabel: t('navGoToCategories'),
     },
     {
         to: localePath('/shop/creator'),
