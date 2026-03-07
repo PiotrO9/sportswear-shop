@@ -10,6 +10,9 @@ export default defineNuxtConfig({
         '@nuxtjs/seo',
         '@nuxtjs/i18n',
     ],
+    supabase: {
+        redirect: false,
+    },
     i18n: {
         locales: [
             {
