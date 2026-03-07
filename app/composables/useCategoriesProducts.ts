@@ -280,8 +280,13 @@ export function useCategoriesProducts() {
         return result;
     }
 
+    function getProductById(id: string): Product | undefined {
+        return allProducts.find((p) => p.id === id);
+    }
+
     return {
         allProducts,
         filterProducts,
+        getProductById,
     };
 }

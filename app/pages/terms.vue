@@ -99,9 +99,7 @@ usePageMeta({
             </p>
         </section>
 
-        <p
-            class="text-secondary-500 dark:text-secondary-500 mt-10 text-sm"
-        >
+        <p class="text-secondary-500 dark:text-secondary-500 mt-10 text-sm">
             {{ t('termsLastUpdate') }}
         </p>
     </article>

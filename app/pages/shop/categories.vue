@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ProductCard from '~/components/shop/ProductCard.vue';
 import type {
     ProductCategory,
     ProductColor,
@@ -9,6 +10,7 @@ import type {
 
 const { t } = useI18n();
 const { filterProducts } = useCategoriesProducts();
+const { addToast } = useToast();
 
 usePageMeta({
     title: () => t('categoriesTitle'),
@@ -63,12 +65,6 @@ watch(
         currentPage.value = 1;
     },
 );
-
-function handleSizeChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-
-    filterSize.value = target.value ? (target.value as ProductSize) : null;
-}
 
 function handleResetFilters() {
     filterCategory.value = 'all';
@@ -138,12 +134,19 @@ function handleNextKeyDown(event: KeyboardEvent) {
     handleNextPage();
 }
 
-function formatPrice(price: number): string {
-    return new Intl.NumberFormat('pl-PL', {
-        style: 'currency',
-        currency: 'PLN',
-        minimumFractionDigits: 2,
-    }).format(price);
+function handleAddToCart(payload: {
+    product: { name: string };
+    size: string;
+    color: string;
+}) {
+    addToast({
+        title: t('productCardAddedToCart'),
+        description: t('productCardAddedToCartDesc', {
+            name: payload.product.name,
+            size: payload.size,
+        }),
+        variant: 'success',
+    });
 }
 </script>
 
@@ -232,40 +235,51 @@ function formatPrice(price: number): string {
                     {{ t('categoriesProductsEmpty') }}
                 </div>
 
-                <ul
-                    v-else
-                    class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-                    role="list"
-                >
-                    <li
-                        v-for="product in paginatedProducts"
-                        :key="product.id"
-                        class="border-secondary-200 dark:border-secondary-800 dark:bg-secondary-900 flex flex-col overflow-hidden rounded-xl border bg-white"
+                <ClientOnly v-else>
+                    <ul
+                        class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                        role="list"
                     >
-                        <div
-                            class="bg-secondary-100 dark:bg-secondary-800 relative flex aspect-[4/5] items-center justify-center"
-                            :aria-label="t('categoriesProductImagePlaceholder')"
+                        <li
+                            v-for="product in paginatedProducts"
+                            :key="product.id"
                         >
-                            <Icon
-                                name="heroicons:photo"
-                                class="text-secondary-400 dark:text-secondary-500 size-16"
-                                aria-hidden="true"
+                            <ProductCard
+                                :product="product"
+                                @add-to-cart="handleAddToCart"
                             />
-                        </div>
-                        <div class="flex flex-1 flex-col p-4">
-                            <h3
-                                class="text-secondary-900 dark:text-secondary-50 font-medium"
+                        </li>
+                    </ul>
+                    <template #fallback>
+                        <ul
+                            class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                            role="list"
+                            aria-label="Loading products"
+                        >
+                            <li
+                                v-for="i in 9"
+                                :key="i"
+                                class="border-secondary-200 dark:border-secondary-800 flex flex-col overflow-hidden rounded-xl border bg-white"
                             >
-                                {{ product.name }}
-                            </h3>
-                            <p
-                                class="text-primary-600 dark:text-primary-400 mt-1 text-lg font-semibold"
-                            >
-                                {{ formatPrice(product.price) }}
-                            </p>
-                        </div>
-                    </li>
-                </ul>
+                                <div
+                                    class="bg-secondary-200 dark:bg-secondary-800 aspect-4/5 animate-pulse"
+                                />
+                                <div class="flex flex-col gap-2 p-4">
+                                    <Skeleton
+                                        width="80%"
+                                        height="1rem"
+                                        aria-label="Loading"
+                                    />
+                                    <Skeleton
+                                        width="40%"
+                                        height="1.25rem"
+                                        aria-label="Loading"
+                                    />
+                                </div>
+                            </li>
+                        </ul>
+                    </template>
+                </ClientOnly>
 
                 <nav
                     v-if="filteredProducts.length > 0 && totalPages > 1"
