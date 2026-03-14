@@ -14,8 +14,8 @@ const isBurgerOpen = ref(false);
 const navLinks = computed<NavLink[]>(() => [
     {
         to: localePath('/shop/categories'),
-        label: t('footerShopCategories'),
-        ariaLabel: t('navGoToCategories'),
+        label: t('navProducts'),
+        ariaLabel: t('navGoToProducts'),
     },
     {
         to: localePath('/shop/creator'),

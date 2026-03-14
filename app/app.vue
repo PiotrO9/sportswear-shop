@@ -34,7 +34,7 @@ useHead(() => ({
 
 <template>
     <div
-        class="min-h-dvh bg-white font-sans text-slate-950 dark:bg-slate-950 dark:text-slate-50"
+        class="min-h-dvh bg-secondary-950 font-sans text-secondary-50"
     >
         <NuxtRouteAnnouncer />
         <NuxtLayout>
