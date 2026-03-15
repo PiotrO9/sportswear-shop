@@ -397,7 +397,7 @@ function getIndentClass(depth: number): string {
                     <Icon
                         v-if="item.children?.length"
                         name="heroicons:chevron-right"
-                        class="size-4 flex-none text-slate-400 transition-transform duration-200 dark:text-slate-500"
+                        class="size-4 flex-none text-slate-400 transition-transform duration-200 dark:text-slate-400"
                         :class="{ 'rotate-90': isExpanded(item.id) }"
                         aria-hidden="true"
                     />
@@ -463,7 +463,7 @@ function getIndentClass(depth: number): string {
                 <Icon
                     v-if="item.children?.length"
                     name="heroicons:chevron-right"
-                    class="size-4 flex-none text-slate-400 transition-transform duration-200 dark:text-slate-500"
+                    class="size-4 flex-none text-slate-400 transition-transform duration-200 dark:text-slate-400"
                     :class="{ 'rotate-90': isExpanded(item.id) }"
                     aria-hidden="true"
                 />

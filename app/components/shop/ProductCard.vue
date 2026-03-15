@@ -63,7 +63,7 @@ function handleAddToCart(payload: {
                 >
                     <Icon
                         name="heroicons:photo"
-                        class="text-secondary-400 dark:text-secondary-500 size-16"
+                        class="text-secondary-400 dark:text-secondary-100 size-16"
                         aria-hidden="true"
                     />
                 </div>

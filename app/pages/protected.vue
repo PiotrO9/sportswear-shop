@@ -40,14 +40,14 @@ function handleGoHome() {
             </template>
 
             <div class="space-y-2 text-sm">
-                <p class="text-slate-600 dark:text-slate-400">
+                <p class="text-slate-600 dark:text-slate-300">
                     {{ t('protectedLoggedInAs') }}
                     <span
                         class="font-semibold text-slate-900 dark:text-slate-50"
                         >{{ session?.userName }}</span
                     >
                 </p>
-                <p class="break-all text-slate-500 dark:text-slate-500">
+                <p class="break-all text-slate-600 dark:text-slate-300">
                     {{ t('protectedToken') }}
                     <span
                         class="font-mono text-slate-700 dark:text-slate-300"

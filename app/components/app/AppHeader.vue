@@ -86,7 +86,7 @@ const navLinks = computed<NavLink[]>(() => [
 function linkClass(to: string): string {
     const path = route.path.replace(/\/$/, '');
     const linkPath = to.replace(/\/$/, '');
-    const isActive = path === linkPath || path.startsWith(linkPath + '/');
+    const isActive = path === linkPath || path.startsWith(`${linkPath}/`);
 
     if (isActive)
         return 'bg-secondary-100 text-secondary-900 dark:bg-secondary-800 dark:text-secondary-50';
@@ -96,7 +96,8 @@ function linkClass(to: string): string {
 
 function productsButtonClass(): string {
     const path = route.path.replace(/\/$/, '');
-    const isActive = path.startsWith('/shop') && !path.startsWith('/shop/creator');
+    const isActive =
+        path.startsWith('/shop') && !path.startsWith('/shop/creator');
 
     if (isActive || isProductsMenuOpen.value) {
         return 'bg-secondary-100 text-secondary-900 dark:bg-secondary-800 dark:text-secondary-50';
@@ -148,12 +149,14 @@ function handleProductsMenuButtonKeyDown(event: KeyboardEvent) {
     if (event.key === 'ArrowDown') {
         event.preventDefault();
         handleOpenProductsMenu();
+
         return;
     }
 
     if (event.key === 'Escape') {
         event.preventDefault();
         handleCloseProductsMenu();
+
         return;
     }
 
@@ -175,12 +178,15 @@ function handleHeaderFocusOut(event: FocusEvent) {
     const currentTarget = headerRef.value;
 
     if (!currentTarget) return;
+
     if (!nextTarget) {
         handleCloseProductsMenu();
+
         return;
     }
 
     if (currentTarget.contains(nextTarget)) return;
+
     handleCloseProductsMenu();
 }
 
@@ -199,7 +205,7 @@ watch(
 <template>
     <header
         ref="headerRef"
-        class="border-secondary-200 dark:border-secondary-800 dark:bg-secondary-950/95 sticky top-0 z-40 border-b bg-white/95 backdrop-blur"
+        class="border-secondary-200 dark:border-secondary-800 dark:bg-secondary-950/95 sticky top-0 z-40 border-b bg-white/95 backdrop-blur lg:relative"
         @mouseleave="handleHeaderMouseLeave"
         @focusout="handleHeaderFocusOut"
     >
@@ -255,7 +261,7 @@ watch(
 
                 <button
                     type="button"
-                    class="text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-secondary-50 focus-visible:ring-primary-400 cursor-pointer rounded-lg p-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:hidden"
+                    class="text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-secondary-50 focus-visible:ring-primary-400 flex cursor-pointer items-center justify-center rounded-lg p-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:hidden"
                     :aria-label="t('navOpenMenu')"
                     :aria-expanded="isBurgerOpen"
                     tabindex="0"
@@ -265,6 +271,7 @@ watch(
                     <Icon
                         name="heroicons:bars-3"
                         class="size-6"
+                        size="24"
                         aria-hidden="true"
                     />
                 </button>
@@ -282,7 +289,7 @@ watch(
             <section
                 v-if="isProductsMenuOpen"
                 id="products-mega-menu"
-                class="hidden lg:block"
+                class="border-secondary-200 dark:border-secondary-800 dark:bg-secondary-950 absolute top-full right-0 left-0 z-50 hidden border-b bg-white lg:block"
                 :aria-label="t('navProducts')"
                 @keydown="handleProductsMegaMenuKeyDown"
             >

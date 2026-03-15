@@ -26,7 +26,7 @@ withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>();
 
 const inputClass =
-    'w-full rounded-xl border border-slate-300 bg-white px-4 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-500 dark:focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60';
+    'w-full rounded-xl border border-slate-300 bg-white px-4 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-400 dark:focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60';
 
 function handleInput(event: Event) {
     const target = event.target as HTMLInputElement;

@@ -67,7 +67,7 @@ function handleApiPost() {
 
             <div class="space-y-4">
                 <div class="space-y-2">
-                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                    <p class="text-sm text-slate-600 dark:text-slate-300">
                         {{ t('apiDemoUseApiDesc') }}
                     </p>
                     <div class="flex flex-wrap gap-3">
@@ -104,7 +104,7 @@ function handleApiPost() {
                     class="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900"
                 >
                     <p
-                        class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
+                        class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-300"
                     >
                         {{ t('apiDemoGetResponse') }}
                     </p>
@@ -125,7 +125,7 @@ function handleApiPost() {
                     class="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900"
                 >
                     <p
-                        class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
+                        class="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-300"
                     >
                         {{ t('apiDemoPostResponse') }}
                     </p>

@@ -127,7 +127,7 @@ function handleLogoutClick() {
             </template>
 
             <div class="space-y-4">
-                <p class="text-sm text-slate-600 dark:text-slate-400">
+                <p class="text-sm text-slate-600 dark:text-slate-300">
                     {{ t('commonStatus') }}:
                     <span
                         class="font-semibold text-slate-900 dark:text-slate-50"

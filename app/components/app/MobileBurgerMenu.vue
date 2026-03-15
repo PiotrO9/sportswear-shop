@@ -5,6 +5,13 @@ interface NavLink {
     ariaLabel: string;
 }
 
+interface ProductCategory {
+    to: string;
+    title: string;
+    ariaLabel: string;
+    variants: NavLink[];
+}
+
 interface UtilityLink {
     to: string;
     label: string;
@@ -28,14 +35,64 @@ const localePath = useLocalePath();
 
 const navLinks = computed<NavLink[]>(() => [
     {
-        to: localePath('/shop/categories'),
-        label: t('navProducts'),
-        ariaLabel: t('navGoToProducts'),
-    },
-    {
         to: localePath('/shop/creator'),
         label: t('footerShopCreator'),
         ariaLabel: t('navGoToCreator'),
+    },
+]);
+
+const productCategories = computed<ProductCategory[]>(() => [
+    {
+        to: localePath('/shop/rashguard'),
+        title: t('navCategoryRashguard'),
+        ariaLabel: t('navGoToCategoryRashguard'),
+        variants: [
+            {
+                to: localePath('/shop/rashguard/short-sleeve'),
+                label: t('navSleeveShort'),
+                ariaLabel: t('navGoToRashguardShortSleeve'),
+            },
+            {
+                to: localePath('/shop/rashguard/long-sleeve'),
+                label: t('navSleeveLong'),
+                ariaLabel: t('navGoToRashguardLongSleeve'),
+            },
+        ],
+    },
+    {
+        to: localePath('/shop/technical-shirt'),
+        title: t('navCategoryTechnicalShirt'),
+        ariaLabel: t('navGoToCategoryTechnicalShirt'),
+        variants: [
+            {
+                to: localePath('/shop/technical-shirt/short-sleeve'),
+                label: t('navSleeveShort'),
+                ariaLabel: t('navGoToTechnicalShirtShortSleeve'),
+            },
+            {
+                to: localePath('/shop/technical-shirt/long-sleeve'),
+                label: t('navSleeveLong'),
+                ariaLabel: t('navGoToTechnicalShirtLongSleeve'),
+            },
+        ],
+    },
+    {
+        to: localePath('/shop/shorts'),
+        title: t('navCategoryShorts'),
+        ariaLabel: t('navGoToCategoryShorts'),
+        variants: [],
+    },
+    {
+        to: localePath('/shop/jerseys'),
+        title: t('navCategoryJersey'),
+        ariaLabel: t('navGoToCategoryJersey'),
+        variants: [],
+    },
+    {
+        to: localePath('/shop/hoodies'),
+        title: t('navCategoryHoodie'),
+        ariaLabel: t('navGoToCategoryHoodie'),
+        variants: [],
     },
 ]);
 
@@ -81,6 +138,7 @@ watch(
     () => props.open,
     (isOpen) => {
         if (typeof document === 'undefined') return;
+
         if (isOpen) {
             document.body.style.overflow = 'hidden';
         } else {
@@ -165,6 +223,68 @@ onUnmounted(() => {
                                 :aria-label="t('navMainNavigation')"
                             >
                                 <NuxtLink
+                                    :to="localePath('/shop/categories')"
+                                    class="text-secondary-900 dark:text-secondary-50 hover:bg-secondary-100 dark:hover:bg-secondary-800 flex items-center justify-between rounded-lg px-3 py-3 text-base font-medium transition"
+                                    :aria-label="t('navGoToProducts')"
+                                >
+                                    {{ t('navProducts') }}
+                                    <Icon
+                                        name="heroicons:chevron-right"
+                                        class="text-secondary-400 size-5"
+                                        aria-hidden="true"
+                                    />
+                                </NuxtLink>
+
+                                <div class="mt-2 px-3">
+                                    <p
+                                        class="text-secondary-500 dark:text-secondary-400 text-xs font-semibold tracking-wide uppercase"
+                                    >
+                                        {{ t('navProductsSectionCategories') }}
+                                    </p>
+                                </div>
+
+                                <div class="mt-1 flex flex-col gap-1">
+                                    <div
+                                        v-for="category in productCategories"
+                                        :key="category.to"
+                                        class="space-y-1"
+                                    >
+                                        <NuxtLink
+                                            :to="category.to"
+                                            class="text-secondary-800 dark:text-secondary-100 hover:bg-secondary-100 dark:hover:bg-secondary-800 flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition"
+                                            :aria-label="category.ariaLabel"
+                                        >
+                                            {{ category.title }}
+                                            <Icon
+                                                name="heroicons:chevron-right"
+                                                class="text-secondary-400 size-4"
+                                                aria-hidden="true"
+                                            />
+                                        </NuxtLink>
+
+                                        <ul
+                                            v-if="category.variants.length > 0"
+                                            class="flex flex-col gap-1 pl-4"
+                                        >
+                                            <li
+                                                v-for="variant in category.variants"
+                                                :key="variant.to"
+                                            >
+                                                <NuxtLink
+                                                    :to="variant.to"
+                                                    class="text-secondary-600 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800 block rounded-lg px-3 py-2 text-sm transition"
+                                                    :aria-label="
+                                                        variant.ariaLabel
+                                                    "
+                                                >
+                                                    {{ variant.label }}
+                                                </NuxtLink>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <NuxtLink
                                     v-for="link in navLinks"
                                     :key="link.to"
                                     :to="link.to"
@@ -175,6 +295,7 @@ onUnmounted(() => {
                                     <Icon
                                         name="heroicons:chevron-right"
                                         class="text-secondary-400 size-5"
+                                        size="24"
                                         aria-hidden="true"
                                     />
                                 </NuxtLink>

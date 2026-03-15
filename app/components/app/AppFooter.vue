@@ -173,7 +173,7 @@ function handleSocialKeyDown(event: KeyboardEvent, href: string) {
                         </div>
                     </div>
                 </div>
-                <p class="text-secondary-500 dark:text-secondary-500 text-xs">
+                <p class="text-secondary-500 text-xs dark:text-white">
                     {{ t('footerCopyright', { year: currentYear }) }}
                 </p>
             </div>
