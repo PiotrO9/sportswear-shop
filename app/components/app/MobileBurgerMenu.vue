@@ -29,18 +29,13 @@ const localePath = useLocalePath();
 const navLinks = computed<NavLink[]>(() => [
     {
         to: localePath('/shop/categories'),
-        label: t('footerShopCategories'),
-        ariaLabel: t('navGoToCategories'),
+        label: t('navProducts'),
+        ariaLabel: t('navGoToProducts'),
     },
     {
         to: localePath('/shop/creator'),
         label: t('footerShopCreator'),
         ariaLabel: t('navGoToCreator'),
-    },
-    {
-        to: localePath('/design-system'),
-        label: t('navDesignSystem'),
-        ariaLabel: t('navGoToDesignSystem'),
     },
 ]);
 
