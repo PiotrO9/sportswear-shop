@@ -12,10 +12,58 @@ interface Emits {
     ): void;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const { t } = useI18n();
+
+const productImages = computed(() => props.product.images ?? []);
+const hasImages = computed(() => productImages.value.length > 0);
+const hasMultipleImages = computed(() => productImages.value.length > 1);
+const activeImageSrc = computed(
+    () => productImages.value[activeImageIndex.value],
+);
+
+const activeImageIndex = ref(0);
+const slideDirection = ref<'left' | 'right'>('right');
+const isAnimating = ref(false);
+
+function handlePrevImage(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!hasMultipleImages.value || isAnimating.value) return;
+
+    slideDirection.value = 'left';
+    isAnimating.value = true;
+    activeImageIndex.value =
+        (activeImageIndex.value - 1 + productImages.value.length) %
+        productImages.value.length;
+}
+
+function handleNextImage(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!hasMultipleImages.value || isAnimating.value) return;
+
+    slideDirection.value = 'right';
+    isAnimating.value = true;
+    activeImageIndex.value =
+        (activeImageIndex.value + 1) % productImages.value.length;
+}
+
+function handleDotClick(event: Event, index: number): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (index === activeImageIndex.value || isAnimating.value) return;
+
+    slideDirection.value = index > activeImageIndex.value ? 'right' : 'left';
+    isAnimating.value = true;
+    activeImageIndex.value = index;
+}
+
+function handleTransitionEnd(): void {
+    isAnimating.value = false;
+}
 
 function formatPrice(price: number): string {
     return new Intl.NumberFormat('pl-PL', {
@@ -49,13 +97,87 @@ function handleAddToCart(payload: {
             <div
                 class="bg-secondary-100 dark:bg-secondary-800 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-700 relative flex aspect-4/5 items-center justify-center overflow-hidden transition-colors"
             >
-                <img
-                    v-if="product.imageUrl"
-                    :src="product.imageUrl"
-                    :alt="product.name"
-                    class="size-full object-cover"
-                    loading="lazy"
-                />
+                <template v-if="hasImages">
+                    <Transition
+                        :name="
+                            slideDirection === 'right'
+                                ? 'card-slide-right'
+                                : 'card-slide-left'
+                        "
+                        mode="out-in"
+                        @after-enter="handleTransitionEnd"
+                        @after-leave="handleTransitionEnd"
+                    >
+                        <img
+                            :key="activeImageIndex"
+                            :src="activeImageSrc"
+                            :alt="`${product.name} - ${activeImageIndex + 1}`"
+                            class="size-full object-contain"
+                            loading="lazy"
+                        />
+                    </Transition>
+
+                    <template v-if="hasMultipleImages">
+                        <button
+                            type="button"
+                            class="bg-white/70 hover:bg-white dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute left-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            :aria-label="t('productCardPrevImage')"
+                            tabindex="0"
+                            @click="handlePrevImage"
+                            @keydown.enter="handlePrevImage"
+                        >
+                            <Icon
+                                name="heroicons:chevron-left"
+                                class="text-secondary-700 dark:text-secondary-200 size-4"
+                                aria-hidden="true"
+                            />
+                        </button>
+
+                        <button
+                            type="button"
+                            class="bg-white/70 hover:bg-white dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute right-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            :aria-label="t('productCardNextImage')"
+                            tabindex="0"
+                            @click="handleNextImage"
+                            @keydown.enter="handleNextImage"
+                        >
+                            <Icon
+                                name="heroicons:chevron-right"
+                                class="text-secondary-700 dark:text-secondary-200 size-4"
+                                aria-hidden="true"
+                            />
+                        </button>
+
+                        <div
+                            class="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 gap-1.5"
+                            role="tablist"
+                            :aria-label="t('productCardImageIndicators')"
+                        >
+                            <button
+                                v-for="(_, index) in productImages"
+                                :key="index"
+                                type="button"
+                                class="rounded-full transition-all duration-300"
+                                :class="
+                                    index === activeImageIndex
+                                        ? 'bg-primary-600 dark:bg-primary-400 h-2 w-5'
+                                        : 'bg-secondary-400/60 hover:bg-secondary-500 dark:bg-secondary-500/60 dark:hover:bg-secondary-400 size-2'
+                                "
+                                role="tab"
+                                :aria-selected="index === activeImageIndex"
+                                :aria-label="
+                                    t('productCardImageDot', {
+                                        index: index + 1,
+                                    })
+                                "
+                                tabindex="0"
+                                @click="handleDotClick($event, index)"
+                                @keydown.enter="handleDotClick($event, index)"
+                            />
+                        </div>
+                    </template>
+                </template>
+
                 <div
                     v-else
                     class="flex size-full items-center justify-center"
@@ -95,3 +217,32 @@ function handleAddToCart(payload: {
         </div>
     </div>
 </template>
+
+<style scoped>
+.card-slide-right-enter-active,
+.card-slide-right-leave-active,
+.card-slide-left-enter-active,
+.card-slide-left-leave-active {
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-slide-right-enter-from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.97);
+}
+
+.card-slide-right-leave-to {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.97);
+}
+
+.card-slide-left-enter-from {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.97);
+}
+
+.card-slide-left-leave-to {
+    opacity: 0;
+    transform: translateX(40px) scale(0.97);
+}
+</style>

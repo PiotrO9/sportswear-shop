@@ -10,10 +10,12 @@ import type {
 
 interface Props {
     initialCategory?: ProductCategory | 'all';
+    initialSubcategory?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     initialCategory: 'all',
+    initialSubcategory: null,
 });
 
 const { t } = useI18n();
@@ -41,6 +43,7 @@ const filteredProducts = computed(() =>
         filterMaterial.value,
         filterColor.value,
         filterSort.value,
+        props.initialSubcategory,
     ),
 );
 

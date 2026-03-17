@@ -49,7 +49,7 @@ const productCategories = computed<ProductCategory[]>(() => [
         variants: [
             {
                 to: localePath('/shop/rashguard/short-sleeve'),
-                label: t('navSleeveShort'),
+                label: t('navRashguardShortSleeveLabel'),
                 ariaLabel: t('navGoToRashguardShortSleeve'),
             },
             {

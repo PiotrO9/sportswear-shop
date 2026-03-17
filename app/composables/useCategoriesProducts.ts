@@ -13,9 +13,14 @@ const MOCK_PRODUCTS: Product[] = [
         name: 'Koszulka sportowa Pro',
         price: 89.99,
         category: 'men',
+        subcategory: 'rashguard-short-sleeve',
         sizes: ['S', 'M', 'L', 'XL'],
         material: 'cotton',
         colors: ['black', 'white', 'navy'],
+        images: [
+            '/images/products/koszulka_1_front.png',
+            '/images/products/koszulka_1_plecy.png',
+        ],
     },
     {
         id: '2',
@@ -246,9 +251,21 @@ export function useCategoriesProducts() {
         material: ProductMaterial | 'all',
         color: ProductColor | 'all',
         sort: ProductSort,
+        subcategory: string | null = null,
     ): Product[] {
         let result = allProducts.filter((product) => {
-            if (category !== 'all' && product.category !== category) {
+            if (
+                subcategory &&
+                product.subcategory !== subcategory
+            ) {
+                return false;
+            }
+
+            if (
+                !subcategory &&
+                category !== 'all' &&
+                product.category !== category
+            ) {
                 return false;
             }
 

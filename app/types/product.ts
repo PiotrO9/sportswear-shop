@@ -13,8 +13,9 @@ export interface Product {
     name: string;
     price: number;
     category: ProductCategory;
+    subcategory?: string;
     sizes: ProductSize[];
     material: ProductMaterial;
     colors: ProductColor[];
-    imageUrl?: string;
+    images?: string[];
 }
