@@ -17,6 +17,10 @@ const { handleLogout } = useLogout();
 function handleGoHome() {
     navigateTo(localePath('/'));
 }
+
+function handleGoAdmin() {
+    navigateTo(localePath('/admin'));
+}
 </script>
 
 <template>
@@ -58,6 +62,13 @@ function handleGoHome() {
 
             <template #footer>
                 <div class="flex flex-wrap gap-2">
+                    <Action
+                        variant="ghost"
+                        aria-label="Przejdź do panelu administratora"
+                        @click="handleGoAdmin"
+                    >
+                        Panel admina
+                    </Action>
                     <Action
                         variant="secondary"
                         :aria-label="t('navLogOut')"

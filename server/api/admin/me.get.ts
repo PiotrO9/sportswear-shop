@@ -1,4 +1,4 @@
-import { requireAdmin } from '~/server/utils/admin-auth';
+import { requireAdmin } from '../../utils/admin-auth';
 
 export default defineEventHandler(async (event) => {
     const admin = await requireAdmin(event);

@@ -51,6 +51,9 @@ export default defineNuxtConfig({
             apiBase: process.env.NUXT_PUBLIC_API_BASE || '',
             siteUrl:
                 process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+            enableAdminMock:
+                process.env.NUXT_PUBLIC_ENABLE_ADMIN_MOCK === 'true' ||
+                process.env.NODE_ENV !== 'production',
         },
     },
     components: [

@@ -11,7 +11,14 @@ usePageMeta({
 
 const route = useRoute();
 const { addToast } = useToast();
-const { isAuthenticated, session, login } = useAuthSession();
+const {
+    isAuthenticated,
+    isMockEnabled,
+    session,
+    login,
+    mockAdminEmail,
+    mockAdminPassword,
+} = useAuthSession();
 const { handleLogout } = useLogout();
 
 const redirectQuerySchema = z.string().min(1).optional();
@@ -104,6 +111,16 @@ function handleGoHome() {
 function handleLogoutClick() {
     handleLogout();
 }
+
+async function handleLoginAsMockAdmin() {
+    if (isLoading.value || !isMockEnabled.value) {
+        return;
+    }
+
+    email.value = mockAdminEmail;
+    password.value = mockAdminPassword;
+    await handleLogin();
+}
 </script>
 
 <template>
@@ -143,6 +160,24 @@ function handleLogoutClick() {
                 </p>
 
                 <div v-if="!isAuthenticated" class="space-y-4">
+                    <div
+                        v-if="isMockEnabled"
+                        class="bg-primary-50 dark:bg-primary-950/30 border-primary-200 dark:border-primary-900 rounded-xl border p-3"
+                    >
+                        <p
+                            class="text-primary-800 dark:text-primary-300 text-sm font-semibold"
+                        >
+                            Konto testowe admina
+                        </p>
+                        <p
+                            class="text-primary-700 dark:text-primary-400 mt-1 text-xs"
+                        >
+                            E-mail: <strong>{{ mockAdminEmail }}</strong> |
+                            Hasło:
+                            <strong>{{ mockAdminPassword }}</strong>
+                        </p>
+                    </div>
+
                     <div class="space-y-2">
                         <label
                             class="block text-sm font-medium text-slate-700 dark:text-slate-300"
@@ -189,7 +224,16 @@ function handleLogoutClick() {
                         {{ isLoading ? t('loginLoggingIn') : t('navLogIn') }}
                     </Action>
                     <Action
-                        v-else
+                        v-if="!isAuthenticated && isMockEnabled"
+                        variant="secondary"
+                        aria-label="Zaloguj testowym kontem administratora"
+                        :is-disabled="isLoading"
+                        @click="handleLoginAsMockAdmin"
+                    >
+                        Zaloguj jako Admin Demo
+                    </Action>
+                    <Action
+                        v-if="isAuthenticated"
                         variant="secondary"
                         :aria-label="t('navLogOut')"
                         @click="handleLogoutClick"

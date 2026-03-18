@@ -4,6 +4,7 @@ export interface AuthSession {
     userId?: string;
     email?: string;
     expiresAt?: number;
+    role?: 'admin' | 'customer';
 }
 
 interface LoginResponse {
@@ -26,6 +27,31 @@ interface MeResponse {
         email: string;
     };
     accessToken?: string;
+}
+
+const MOCK_ADMIN_EMAIL = 'admin@mock.local';
+const MOCK_ADMIN_PASSWORD = 'Admin123!';
+const MOCK_ADMIN_COOKIE = 'admin_mock_session';
+
+function createMockAdminSession(): AuthSession {
+    return {
+        token: `mock_admin_${Date.now()}`,
+        userName: 'Admin Demo',
+        userId: 'mock-admin',
+        email: MOCK_ADMIN_EMAIL,
+        role: 'admin',
+    };
+}
+
+function isMockAdminCredentials(email: string, password: string): boolean {
+    if (!email || !password) {
+        return false;
+    }
+
+    return (
+        email.trim().toLowerCase() === MOCK_ADMIN_EMAIL &&
+        password.trim() === MOCK_ADMIN_PASSWORD
+    );
 }
 
 function createSessionFromResponse(
@@ -56,6 +82,11 @@ function createSessionFromResponse(
 export function useAuthSession() {
     const config = useRuntimeConfig();
     const apiBase = config.public.apiBase || '/api';
+    const isMockEnabled = Boolean(config.public.enableAdminMock);
+    const adminMockSessionCookie = useCookie<string | null>(MOCK_ADMIN_COOKIE, {
+        sameSite: 'lax',
+        path: '/',
+    });
 
     const session = useState<AuthSession | null>('auth_session', () => null);
     const isCheckingSession = ref(false);
@@ -76,6 +107,12 @@ export function useAuthSession() {
         isCheckingSession.value = true;
 
         try {
+            if (isMockEnabled && adminMockSessionCookie.value === '1') {
+                session.value = createMockAdminSession();
+
+                return true;
+            }
+
             const response = await $fetch<MeResponse>(`${apiBase}/auth/me`, {
                 method: 'GET',
                 credentials: 'include',
@@ -102,6 +139,13 @@ export function useAuthSession() {
     async function login(email: string, password: string): Promise<void> {
         if (!email || !password) {
             throw new Error('Email and password are required');
+        }
+
+        if (isMockEnabled && isMockAdminCredentials(email, password)) {
+            adminMockSessionCookie.value = '1';
+            session.value = createMockAdminSession();
+
+            return;
         }
 
         const response = await $fetch<LoginResponse>(`${apiBase}/auth/login`, {
@@ -152,6 +196,8 @@ export function useAuthSession() {
     }
 
     async function logout(): Promise<void> {
+        adminMockSessionCookie.value = null;
+
         if (apiBase) {
             try {
                 await $fetch(`${apiBase}/auth/logout`, {
@@ -182,6 +228,9 @@ export function useAuthSession() {
         session,
         isAuthenticated,
         isCheckingSession: computed(() => isCheckingSession.value),
+        isMockEnabled: computed(() => isMockEnabled),
+        mockAdminEmail: MOCK_ADMIN_EMAIL,
+        mockAdminPassword: MOCK_ADMIN_PASSWORD,
         login,
         loginDemo,
         logout,

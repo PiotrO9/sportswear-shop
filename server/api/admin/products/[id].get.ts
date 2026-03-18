@@ -1,7 +1,7 @@
-import { getAdminProductByIdRepository } from '~/server/repositories/admin-products.repository';
-import { requireAdmin } from '~/server/utils/admin-auth';
-import { productIdParamsSchema } from '~/server/validation/admin-products';
-import { readValidatedParams } from '~/server/utils/validation';
+import { getAdminProductByIdRepository } from '../../../repositories/admin-products.repository';
+import { requireAdmin } from '../../../utils/admin-auth';
+import { productIdParamsSchema } from '../../../validation/admin-products';
+import { readValidatedParams } from '../../../utils/validation';
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event);

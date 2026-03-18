@@ -1,13 +1,13 @@
-import { updateInventoryRepository } from '~/server/repositories/admin-inventory.repository';
-import { requireAdmin } from '~/server/utils/admin-auth';
+import { updateInventoryRepository } from '../../../../repositories/admin-inventory.repository';
+import { requireAdmin } from '../../../../utils/admin-auth';
 import {
     productIdParamsSchema,
     updateInventorySchema,
-} from '~/server/validation/admin-products';
+} from '../../../../validation/admin-products';
 import {
     readValidatedBody,
     readValidatedParams,
-} from '~/server/utils/validation';
+} from '../../../../utils/validation';
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event);

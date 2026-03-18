@@ -11,6 +11,17 @@ export interface AdminContext {
 }
 
 export async function requireAdmin(event: H3Event): Promise<AdminContext> {
+    const config = useRuntimeConfig(event);
+    const isMockEnabled = Boolean(config.public.enableAdminMock);
+    const adminMockSession = getCookie(event, 'admin_mock_session');
+
+    if (isMockEnabled && adminMockSession === '1') {
+        return {
+            userId: 'mock-admin',
+            role: 'admin',
+        };
+    }
+
     const user = await serverSupabaseUser(event);
 
     if (!user) {

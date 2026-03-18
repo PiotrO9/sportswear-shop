@@ -1,5 +1,5 @@
-import { listLowStockInventoryRepository } from '~/server/repositories/admin-inventory.repository';
-import { requireAdmin } from '~/server/utils/admin-auth';
+import { listLowStockInventoryRepository } from '../../../repositories/admin-inventory.repository';
+import { requireAdmin } from '../../../utils/admin-auth';
 
 export default defineEventHandler(async (event) => {
     await requireAdmin(event);
