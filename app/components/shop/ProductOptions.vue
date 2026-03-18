@@ -149,7 +149,7 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
                     v-for="size in product.sizes"
                     :key="size"
                     type="button"
-                    class="focus-visible:ring-primary-500 rounded-md border font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                    class="focus-visible:ring-primary-500 cursor-pointer rounded-md border font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     :class="[
                         compact
                             ? 'min-w-8 px-2 py-1 text-xs'
@@ -189,7 +189,7 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
                     v-for="color in product.colors"
                     :key="color"
                     type="button"
-                    class="focus-visible:ring-primary-500 rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                    class="focus-visible:ring-primary-500 cursor-pointer rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     :class="[
                         compact ? 'size-6' : 'size-8',
                         colorClassMap[color],
@@ -233,7 +233,7 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
             <NuxtLink
                 v-if="showDetailsLink"
                 :to="`/shop/product/${product.id}`"
-                class="border-primary-500 hover:bg-primary-50 dark:border-primary-600 dark:hover:bg-primary-950/30 inline-flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2 font-medium transition"
+                class="border-primary-500 hover:bg-primary-50 dark:border-primary-600 dark:hover:bg-primary-950/30 inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2 font-medium transition"
                 :class="
                     compact
                         ? 'text-primary-600 dark:text-primary-400 text-sm'
@@ -247,7 +247,7 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
             </NuxtLink>
             <button
                 type="button"
-                class="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-700 inline-flex items-center justify-center gap-1.5 rounded-lg font-medium text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                class="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-700 inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg font-medium text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 :class="compact ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-base'"
                 :disabled="!selectedSize || !selectedColor"
                 :aria-label="

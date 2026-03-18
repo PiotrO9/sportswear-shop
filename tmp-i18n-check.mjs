@@ -17,7 +17,10 @@ const missingInEn = [...plKeys].filter((key) => !enKeys.has(key)).sort();
 const missingInPl = [...enKeys].filter((key) => !plKeys.has(key)).sort();
 
 const quoteChar = String.fromCharCode(39);
-const keyInT = new RegExp(`\\bt\\(${quoteChar}([^${quoteChar}]+)${quoteChar}\\)`, 'g');
+const keyInT = new RegExp(
+    `\\bt\\(${quoteChar}([^${quoteChar}]+)${quoteChar}\\)`,
+    'g',
+);
 const keyInDollarT = new RegExp(
     `\\$t\\(${quoteChar}([^${quoteChar}]+)${quoteChar}\\)`,
     'g',
@@ -54,12 +57,8 @@ function walk(directoryPath) {
 
 walk(path.join(root, 'app'));
 
-const usedMissingInPl = [...usedKeys]
-    .filter((key) => !plKeys.has(key))
-    .sort();
-const usedMissingInEn = [...usedKeys]
-    .filter((key) => !enKeys.has(key))
-    .sort();
+const usedMissingInPl = [...usedKeys].filter((key) => !plKeys.has(key)).sort();
+const usedMissingInEn = [...usedKeys].filter((key) => !enKeys.has(key)).sort();
 
 console.log(`MISSING_IN_EN ${missingInEn.length}`);
 for (const key of missingInEn) console.log(`  ${key}`);

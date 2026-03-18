@@ -14,6 +14,13 @@ const product = computed<Product | undefined>(() =>
 const productImages = computed(() => product.value?.images ?? []);
 const hasImages = computed(() => productImages.value.length > 0);
 const hasMultipleImages = computed(() => productImages.value.length > 1);
+const imageContainerClass = computed(() => {
+    if (product.value?.imageContainerTheme === 'light') {
+        return 'bg-white dark:bg-white';
+    }
+
+    return 'bg-secondary-100 dark:bg-secondary-800';
+});
 
 const activeImageIndex = ref(0);
 const slideDirection = ref<'left' | 'right'>('right');
@@ -131,7 +138,8 @@ function handleAddToCart(payload: {
         <div v-else class="grid gap-8 lg:grid-cols-2 lg:gap-12">
             <div class="flex flex-col gap-3">
                 <div
-                    class="bg-secondary-100 dark:bg-secondary-800 relative flex aspect-4/5 items-center justify-center overflow-hidden rounded-xl"
+                    class="relative flex aspect-4/5 items-center justify-center overflow-hidden rounded-xl transition-colors"
+                    :class="imageContainerClass"
                 >
                     <template v-if="hasImages">
                         <Transition
@@ -155,7 +163,7 @@ function handleAddToCart(payload: {
                         <template v-if="hasMultipleImages">
                             <button
                                 type="button"
-                                class="bg-white/70 hover:bg-white dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                                class="dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute top-1/2 left-3 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/70 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
                                 :aria-label="t('productCardPrevImage')"
                                 tabindex="0"
                                 @click="handlePrevImage"
@@ -170,7 +178,7 @@ function handleAddToCart(payload: {
 
                             <button
                                 type="button"
-                                class="bg-white/70 hover:bg-white dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                                class="dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute top-1/2 right-3 z-10 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/70 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
                                 :aria-label="t('productCardNextImage')"
                                 tabindex="0"
                                 @click="handleNextImage"
@@ -199,9 +207,7 @@ function handleAddToCart(payload: {
                                             : 'bg-secondary-400/60 hover:bg-secondary-500 dark:bg-secondary-500/60 dark:hover:bg-secondary-400 size-2.5'
                                     "
                                     role="tab"
-                                    :aria-selected="
-                                        index === activeImageIndex
-                                    "
+                                    :aria-selected="index === activeImageIndex"
                                     :aria-label="
                                         t('productCardImageDot', {
                                             index: index + 1,
@@ -243,8 +249,8 @@ function handleAddToCart(payload: {
                         class="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg transition-all duration-300"
                         :class="
                             index === activeImageIndex
-                                ? 'ring-primary-500 ring-2 ring-offset-2 dark:ring-offset-secondary-900'
-                                : 'opacity-60 hover:opacity-100 ring-1 ring-secondary-200 dark:ring-secondary-700'
+                                ? 'ring-primary-500 dark:ring-offset-secondary-900 ring-2 ring-offset-2'
+                                : 'ring-secondary-200 dark:ring-secondary-700 opacity-60 ring-1 hover:opacity-100'
                         "
                         role="tab"
                         :aria-selected="index === activeImageIndex"

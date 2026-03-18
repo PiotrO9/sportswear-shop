@@ -20,6 +20,19 @@ const { t } = useI18n();
 const productImages = computed(() => props.product.images ?? []);
 const hasImages = computed(() => productImages.value.length > 0);
 const hasMultipleImages = computed(() => productImages.value.length > 1);
+const imageContainerClass = computed(() => {
+    if (props.product.imageContainerTheme === 'light') {
+        return 'bg-white dark:bg-white group-hover:bg-secondary-50 dark:group-hover:bg-secondary-50';
+    }
+
+    return 'bg-secondary-100 dark:bg-secondary-800 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-700';
+});
+const imageInteractionClass = computed(() => {
+    if (!hasMultipleImages.value) return undefined;
+    if (isDragging.value) return 'cursor-grabbing select-none';
+
+    return 'cursor-grab';
+});
 const activeImageSrc = computed(
     () => productImages.value[activeImageIndex.value],
 );
@@ -27,10 +40,13 @@ const activeImageSrc = computed(
 const activeImageIndex = ref(0);
 const slideDirection = ref<'left' | 'right'>('right');
 const isAnimating = ref(false);
+const isDragging = ref(false);
+const dragStartX = ref(0);
+const activePointerId = ref<number | null>(null);
 
-function handlePrevImage(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
+const SWIPE_THRESHOLD_PX = 40;
+
+function showPrevImage(): void {
     if (!hasMultipleImages.value || isAnimating.value) return;
 
     slideDirection.value = 'left';
@@ -40,15 +56,25 @@ function handlePrevImage(event: Event): void {
         productImages.value.length;
 }
 
-function handleNextImage(event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
+function showNextImage(): void {
     if (!hasMultipleImages.value || isAnimating.value) return;
 
     slideDirection.value = 'right';
     isAnimating.value = true;
     activeImageIndex.value =
         (activeImageIndex.value + 1) % productImages.value.length;
+}
+
+function handlePrevImage(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    showPrevImage();
+}
+
+function handleNextImage(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    showNextImage();
 }
 
 function handleDotClick(event: Event, index: number): void {
@@ -63,6 +89,42 @@ function handleDotClick(event: Event, index: number): void {
 
 function handleTransitionEnd(): void {
     isAnimating.value = false;
+}
+
+function resetPointerState(): void {
+    isDragging.value = false;
+    activePointerId.value = null;
+}
+
+function handleImagePointerDown(event: PointerEvent): void {
+    if (!hasMultipleImages.value || isAnimating.value) return;
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+    activePointerId.value = event.pointerId;
+    dragStartX.value = event.clientX;
+    isDragging.value = true;
+}
+
+function handleImagePointerUp(event: PointerEvent): void {
+    if (!isDragging.value || activePointerId.value !== event.pointerId) return;
+
+    const dragDeltaX = event.clientX - dragStartX.value;
+    const isSwipeGesture = Math.abs(dragDeltaX) >= SWIPE_THRESHOLD_PX;
+
+    if (isSwipeGesture) {
+        if (dragDeltaX > 0) {
+            showPrevImage();
+        } else {
+            showNextImage();
+        }
+    }
+
+    resetPointerState();
+}
+
+function handleImagePointerCancel(event: PointerEvent): void {
+    if (activePointerId.value !== event.pointerId) return;
+    resetPointerState();
 }
 
 function formatPrice(price: number): string {
@@ -84,18 +146,22 @@ function handleAddToCart(payload: {
 
 <template>
     <div
-        class="group border-secondary-200 dark:border-secondary-800 dark:bg-secondary-900 focus-within:ring-primary-500 flex flex-col overflow-hidden rounded-xl border bg-white transition-shadow focus-within:ring-2 focus-within:ring-offset-2 hover:shadow-lg"
+        class="group border-secondary-200 dark:border-secondary-800 dark:bg-secondary-900 flex flex-col overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-lg"
         role="article"
         :aria-label="t('productCardAria', { name: product.name })"
     >
-        <NuxtLink
-            :to="`/shop/product/${product.id}`"
-            class="flex flex-col outline-none"
-            tabindex="0"
+        <div
+            class="flex flex-col"
             :aria-label="t('productCardViewAria', { name: product.name })"
         >
             <div
-                class="bg-secondary-100 dark:bg-secondary-800 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-700 relative flex aspect-4/5 items-center justify-center overflow-hidden transition-colors"
+                class="relative flex aspect-4/5 items-center justify-center overflow-hidden transition-colors"
+                :class="[imageContainerClass, imageInteractionClass]"
+                @pointerdown="handleImagePointerDown"
+                @pointerup="handleImagePointerUp"
+                @pointercancel="handleImagePointerCancel"
+                @pointerleave="handleImagePointerCancel"
+                @dragstart.prevent
             >
                 <template v-if="hasImages">
                     <Transition
@@ -114,13 +180,14 @@ function handleAddToCart(payload: {
                             :alt="`${product.name} - ${activeImageIndex + 1}`"
                             class="size-full object-contain"
                             loading="lazy"
+                            draggable="false"
                         />
                     </Transition>
 
                     <template v-if="hasMultipleImages">
                         <button
                             type="button"
-                            class="bg-white/70 hover:bg-white dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute left-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            class="dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute top-1/2 left-2 z-10 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/70 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
                             :aria-label="t('productCardPrevImage')"
                             tabindex="0"
                             @click="handlePrevImage"
@@ -135,7 +202,7 @@ function handleAddToCart(payload: {
 
                         <button
                             type="button"
-                            class="bg-white/70 hover:bg-white dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute right-2 top-1/2 z-10 flex size-8 -translate-y-1/2 items-center justify-center rounded-full shadow-lg backdrop-blur-sm transition-all hover:scale-110"
+                            class="dark:bg-secondary-900/70 dark:hover:bg-secondary-900 absolute top-1/2 right-2 z-10 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/70 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
                             :aria-label="t('productCardNextImage')"
                             tabindex="0"
                             @click="handleNextImage"
@@ -157,7 +224,7 @@ function handleAddToCart(payload: {
                                 v-for="(_, index) in productImages"
                                 :key="index"
                                 type="button"
-                                class="rounded-full transition-all duration-300"
+                                class="cursor-pointer rounded-full transition-all duration-300"
                                 :class="
                                     index === activeImageIndex
                                         ? 'bg-primary-600 dark:bg-primary-400 h-2 w-5'
@@ -203,7 +270,7 @@ function handleAddToCart(payload: {
                     {{ formatPrice(product.price) }}
                 </p>
             </div>
-        </NuxtLink>
+        </div>
 
         <div
             class="border-secondary-200 dark:border-secondary-800 flex flex-col gap-3 border-t px-4 py-3"

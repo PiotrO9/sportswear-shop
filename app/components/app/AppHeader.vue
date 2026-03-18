@@ -15,6 +15,7 @@ interface ProductCategory {
 const route = useRoute();
 const { t } = useI18n();
 const localePath = useLocalePath();
+const productsLink = localePath('/shop/categories');
 
 const headerRef = ref<HTMLElement | null>(null);
 const isBurgerOpen = ref(false);
@@ -129,10 +130,6 @@ function handleCloseProductsMenu() {
     isProductsMenuOpen.value = false;
 }
 
-function handleProductsMenuButtonClick() {
-    isProductsMenuOpen.value = !isProductsMenuOpen.value;
-}
-
 function handleProductsTriggerHover() {
     handleOpenProductsMenu();
 }
@@ -162,8 +159,7 @@ function handleProductsMenuButtonKeyDown(event: KeyboardEvent) {
 
     if (!isEnterOrSpaceKey(event)) return;
 
-    event.preventDefault();
-    handleProductsMenuButtonClick();
+    handleCloseProductsMenu();
 }
 
 function handleProductsMegaMenuKeyDown(event: KeyboardEvent) {
@@ -225,8 +221,8 @@ watch(
                     class="hidden items-center gap-1 lg:flex"
                     :aria-label="t('navMainNavigation')"
                 >
-                    <button
-                        type="button"
+                    <NuxtLink
+                        :to="productsLink"
                         tabindex="0"
                         class="focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                         :class="productsButtonClass()"
@@ -235,12 +231,11 @@ watch(
                         :aria-expanded="isProductsMenuOpen"
                         aria-controls="products-mega-menu"
                         @mouseenter="handleProductsTriggerHover"
-                        @click="handleProductsMenuButtonClick"
                         @keydown="handleProductsMenuButtonKeyDown"
                         @focus="handleOpenProductsMenu"
                     >
                         {{ t('navProducts') }}
-                    </button>
+                    </NuxtLink>
 
                     <NuxtLink
                         v-for="link in navLinks"

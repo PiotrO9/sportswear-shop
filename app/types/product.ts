@@ -8,6 +8,8 @@ export type ProductColor = 'black' | 'white' | 'grey' | 'navy' | 'red' | 'blue';
 
 export type ProductSort = 'price-asc' | 'price-desc' | 'name-asc';
 
+export type ProductImageContainerTheme = 'default' | 'light';
+
 export interface Product {
     id: string;
     name: string;
@@ -18,4 +20,5 @@ export interface Product {
     material: ProductMaterial;
     colors: ProductColor[];
     images?: string[];
+    imageContainerTheme?: ProductImageContainerTheme;
 }

@@ -75,7 +75,7 @@ const sortOptions: { value: ProductSort; labelKey: string }[] = [
 const sizeOptions: ProductSize[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 const selectClass =
-    'block w-full rounded-md border border-slate-300 bg-white px-2.5 py-1 text-sm text-slate-900 shadow-sm transition outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:focus-visible:ring-offset-slate-950';
+    'block w-full rounded-xl border border-slate-300 bg-white px-4 py-2 text-slate-900 shadow-sm transition outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:focus-visible:ring-offset-slate-950';
 
 function handleSizeChange(event: Event) {
     const target = event.target as HTMLSelectElement;
@@ -154,7 +154,7 @@ function handleSortUpdate(value: string | number) {
     <div :class="[compact ? 'space-y-2' : 'space-y-5', hideTitle && 'pt-0']">
         <div :class="compact ? 'space-y-1' : 'space-y-2'">
             <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                class="block text-base font-medium text-slate-700 dark:text-slate-300"
                 :for="`${idPrefix}-category`"
             >
                 {{ t('categoriesFilterCategory') }}
@@ -195,7 +195,7 @@ function handleSortUpdate(value: string | number) {
 
         <div :class="compact ? 'space-y-1' : 'space-y-2'">
             <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                class="block text-base font-medium text-slate-700 dark:text-slate-300"
                 :for="`${idPrefix}-min-price`"
             >
                 {{ t('categoriesFilterPrice') }}
@@ -222,7 +222,7 @@ function handleSortUpdate(value: string | number) {
 
         <div :class="compact ? 'space-y-1' : 'space-y-2'">
             <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                class="block text-base font-medium text-slate-700 dark:text-slate-300"
                 :for="`${idPrefix}-size`"
             >
                 {{ t('categoriesFilterSize') }}
@@ -245,7 +245,7 @@ function handleSortUpdate(value: string | number) {
 
         <div :class="compact ? 'space-y-1' : 'space-y-2'">
             <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                class="block text-base font-medium text-slate-700 dark:text-slate-300"
                 :for="`${idPrefix}-material`"
             >
                 {{ t('categoriesFilterMaterial') }}
@@ -286,7 +286,7 @@ function handleSortUpdate(value: string | number) {
 
         <div :class="compact ? 'space-y-1' : 'space-y-2'">
             <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                class="block text-base font-medium text-slate-700 dark:text-slate-300"
                 :for="`${idPrefix}-color`"
             >
                 {{ t('categoriesFilterColor') }}
@@ -327,7 +327,7 @@ function handleSortUpdate(value: string | number) {
 
         <div :class="compact ? 'space-y-1' : 'space-y-2'">
             <label
-                class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                class="block text-base font-medium text-slate-700 dark:text-slate-300"
                 :for="`${idPrefix}-sort`"
             >
                 {{ t('categoriesFilterSort') }}
