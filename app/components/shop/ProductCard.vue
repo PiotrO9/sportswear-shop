@@ -21,11 +21,11 @@ const productImages = computed(() => props.product.images ?? []);
 const hasImages = computed(() => productImages.value.length > 0);
 const hasMultipleImages = computed(() => productImages.value.length > 1);
 const imageContainerClass = computed(() => {
-    if (props.product.imageContainerTheme === 'light') {
-        return 'bg-white dark:bg-white group-hover:bg-secondary-50 dark:group-hover:bg-secondary-50';
+    if (props.product.imageContainerTheme === 'default') {
+        return 'bg-secondary-100 dark:bg-secondary-800 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-700';
     }
 
-    return 'bg-secondary-100 dark:bg-secondary-800 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-700';
+    return 'bg-white dark:bg-white group-hover:bg-secondary-50 dark:group-hover:bg-secondary-50';
 });
 const imageInteractionClass = computed(() => {
     if (!hasMultipleImages.value) return undefined;
@@ -146,7 +146,7 @@ function handleAddToCart(payload: {
 
 <template>
     <div
-        class="group border-secondary-200 dark:border-secondary-800 dark:bg-secondary-900 flex flex-col overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-lg"
+        class="group border-secondary-200 dark:border-secondary-800 dark:bg-secondary-900 flex h-full flex-col overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-lg"
         role="article"
         :aria-label="t('productCardAria', { name: product.name })"
     >
@@ -260,7 +260,7 @@ function handleAddToCart(payload: {
 
             <div class="flex flex-col p-4">
                 <h3
-                    class="text-secondary-900 dark:text-secondary-50 group-hover:text-primary-600 dark:group-hover:text-primary-400 line-clamp-2 font-medium transition-colors"
+                    class="text-secondary-900 dark:text-secondary-50 group-hover:text-primary-600 dark:group-hover:text-primary-400 font-medium transition-colors"
                 >
                     {{ product.name }}
                 </h3>
@@ -273,7 +273,7 @@ function handleAddToCart(payload: {
         </div>
 
         <div
-            class="border-secondary-200 dark:border-secondary-800 flex flex-col gap-3 border-t px-4 py-3"
+            class="border-secondary-200 dark:border-secondary-800 mt-auto flex flex-col gap-3 border-t px-4 py-3"
         >
             <ProductOptions
                 :product="product"

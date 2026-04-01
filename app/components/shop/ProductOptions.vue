@@ -65,6 +65,7 @@ onMounted(() => {
     if (props.product.sizes.length > 0 && !selectedSize.value) {
         selectedSize.value = props.product.sizes[0] ?? null;
     }
+
     if (props.product.colors.length > 0 && !selectedColor.value) {
         selectedColor.value = props.product.colors[0] ?? null;
     }
@@ -80,6 +81,7 @@ watch(
         ) {
             selectedSize.value = product.sizes[0] ?? null;
         }
+
         if (
             product.colors.length > 0 &&
             (selectedColor.value === null ||
@@ -217,10 +219,6 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
             :class="compact ? 'text-xs' : 'text-sm'"
         >
             <span>
-                {{ t('productCardMaterial') }}:
-                {{ t(materialLabelKeyMap[product.material]) }}
-            </span>
-            <span>
                 {{ t('productCardCategory') }}:
                 {{ t(categoryLabelKeyMap[product.category]) }}
             </span>
@@ -233,7 +231,7 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
             <NuxtLink
                 v-if="showDetailsLink"
                 :to="`/shop/product/${product.id}`"
-                class="border-primary-500 hover:bg-primary-50 dark:border-primary-600 dark:hover:bg-primary-950/30 inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2 font-medium transition"
+                class="border-primary-500 hover:bg-primary-50 dark:border-primary-600 dark:hover:bg-primary-950/30 inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2 font-medium transition"
                 :class="
                     compact
                         ? 'text-primary-600 dark:text-primary-400 text-sm'
@@ -262,7 +260,6 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
                     class="size-4"
                     aria-hidden="true"
                 />
-                {{ t('productCardAddToCart') }}
             </button>
         </div>
     </div>

@@ -15,11 +15,11 @@ const productImages = computed(() => product.value?.images ?? []);
 const hasImages = computed(() => productImages.value.length > 0);
 const hasMultipleImages = computed(() => productImages.value.length > 1);
 const imageContainerClass = computed(() => {
-    if (product.value?.imageContainerTheme === 'light') {
-        return 'bg-white dark:bg-white';
+    if (product.value?.imageContainerTheme === 'default') {
+        return 'bg-secondary-100 dark:bg-secondary-800';
     }
 
-    return 'bg-secondary-100 dark:bg-secondary-800';
+    return 'bg-white dark:bg-white';
 });
 
 const activeImageIndex = ref(0);
@@ -82,20 +82,6 @@ function handleThumbnailKeyDown(event: KeyboardEvent, index: number): void {
     }
 }
 
-usePageMeta({
-    title: () =>
-        product.value
-            ? `${product.value.name} – Sportswear Shop`
-            : t('productNotFound'),
-    description: () =>
-        product.value
-            ? t('productMetaDescription', {
-                  name: product.value.name,
-                  price: formatPrice(product.value.price),
-              })
-            : '',
-});
-
 function formatPrice(price: number): string {
     return new Intl.NumberFormat('pl-PL', {
         style: 'currency',
@@ -103,6 +89,32 @@ function formatPrice(price: number): string {
         minimumFractionDigits: 2,
     }).format(price);
 }
+
+function buildProductMetaDescription(productItem: Product): string {
+    const raw = productItem.description?.trim();
+    if (!raw) {
+        return t('productMetaDescription', {
+            name: productItem.name,
+            price: formatPrice(productItem.price),
+        });
+    }
+
+    const singleLine = raw.replace(/\s+/g, ' ').trim();
+    if (singleLine.length <= 160) {
+        return singleLine;
+    }
+
+    return `${singleLine.slice(0, 157)}…`;
+}
+
+usePageMeta({
+    title: () =>
+        product.value
+            ? `${product.value.name} – Sportswear Shop`
+            : t('productNotFound'),
+    description: () =>
+        product.value ? buildProductMetaDescription(product.value) : '',
+});
 
 function handleAddToCart(payload: {
     product: { name: string };
@@ -290,6 +302,13 @@ function handleAddToCart(payload: {
                         :show-details-link="false"
                         @add-to-cart="handleAddToCart"
                     />
+                </div>
+
+                <div
+                    v-if="product.description"
+                    class="text-secondary-600 dark:text-secondary-300 mt-8 text-base leading-relaxed whitespace-pre-line"
+                >
+                    {{ product.description }}
                 </div>
 
                 <NuxtLink

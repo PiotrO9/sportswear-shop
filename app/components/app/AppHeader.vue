@@ -211,9 +211,19 @@ watch(
             <div class="flex min-w-0 flex-1 items-center gap-4 lg:flex-initial">
                 <NuxtLink
                     :to="localePath('/')"
-                    class="text-secondary-900 dark:text-secondary-50 hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-400 shrink-0 rounded-lg text-xl font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                    class="text-secondary-900 dark:text-secondary-50 hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-400 inline-flex shrink-0 items-center gap-2 rounded-lg text-xl font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                     :aria-label="t('navGoToHome')"
                 >
+                    <img
+                        src="/images/logo/logo.png"
+                        alt=""
+                        width="40"
+                        height="40"
+                        loading="eager"
+                        decoding="async"
+                        class="size-9 shrink-0 object-contain"
+                        aria-hidden="true"
+                    />
                     Sportswear Shop
                 </NuxtLink>
 

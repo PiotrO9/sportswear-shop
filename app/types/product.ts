@@ -13,6 +13,7 @@ export type ProductImageContainerTheme = 'default' | 'light';
 export interface Product {
     id: string;
     name: string;
+    description?: string;
     price: number;
     category: ProductCategory;
     subcategory?: string;
@@ -20,5 +21,6 @@ export interface Product {
     material: ProductMaterial;
     colors: ProductColor[];
     images?: string[];
+    /** Domyślnie białe tło; ustaw `default` dla szarego tła katalogowego. */
     imageContainerTheme?: ProductImageContainerTheme;
 }

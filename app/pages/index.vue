@@ -68,14 +68,14 @@ const homeCategoryCards = computed<HomeCategoryCard[]>(() => [
         to: localePath('/shop/categories?type=rashguard'),
         title: t('homeCategoryCardGymTitle'),
         description: t('homeCategoryCardGymDescription'),
-        image: '/images/products/koszulka_1_front.png',
+        image: '/images/products/rashguard-short-sleeve-warning-black-front.webp',
         ariaLabel: t('homeCategoryCardGymAria'),
     },
     {
         to: localePath('/shop/categories?type=shorts'),
         title: t('homeCategoryCardRunTitle'),
         description: t('homeCategoryCardRunDescription'),
-        image: '/images/products/koszulka_1_front_biale.webp',
+        image: '/images/products/rashguard-short-sleeve-warning-mint-front.webp',
         ariaLabel: t('homeCategoryCardRunAria'),
     },
 ]);

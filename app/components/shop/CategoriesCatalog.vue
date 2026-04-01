@@ -253,6 +253,7 @@ function handleAddToCart(payload: {
                         <li
                             v-for="product in paginatedProducts"
                             :key="product.id"
+                            class="h-full"
                         >
                             <ProductCard
                                 :product="product"
@@ -269,7 +270,7 @@ function handleAddToCart(payload: {
                             <li
                                 v-for="i in 9"
                                 :key="i"
-                                class="border-secondary-200 dark:border-secondary-800 flex flex-col overflow-hidden rounded-xl border bg-white"
+                                class="border-secondary-200 dark:border-secondary-800 dark:bg-secondary-900 flex h-full flex-col overflow-hidden rounded-xl border bg-white"
                             >
                                 <div
                                     class="bg-secondary-200 dark:bg-secondary-800 aspect-4/5 animate-pulse"
