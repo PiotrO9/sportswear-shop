@@ -1,7 +1,8 @@
 <script setup lang="ts">
 interface Props {
     checked: boolean;
-    ariaLabel: string;
+    /** Tekst dla atrybutu `aria-label` przycisku. */
+    accessibleLabel: string;
     leftIcon?: string;
     rightIcon?: string;
     leftIconClass?: string;
@@ -25,7 +26,7 @@ const emit = defineEmits<Emits>();
 
 const switchClass = computed(() => {
     const base =
-        'relative flex h-8 w-14 cursor-pointer items-center rounded-full px-1 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-secondary-950 disabled:cursor-not-allowed disabled:opacity-60';
+        'relative box-border block h-8 w-14 min-h-8 min-w-14 shrink-0 cursor-pointer rounded-full px-1 transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-secondary-950 disabled:cursor-not-allowed disabled:opacity-60';
 
     const checkedClass = props.checked
         ? 'bg-primary-500 dark:bg-primary-600'
@@ -57,7 +58,7 @@ function handleKeyDown(event: KeyboardEvent) {
     <button
         type="button"
         :disabled="props.isDisabled"
-        :aria-label="props.ariaLabel"
+        :aria-label="props.accessibleLabel"
         :aria-checked="props.checked"
         role="switch"
         tabindex="0"
@@ -86,8 +87,12 @@ function handleKeyDown(event: KeyboardEvent) {
             aria-hidden="true"
         />
         <span
-            class="absolute flex size-6 items-center justify-center rounded-full bg-white shadow-md transition-transform duration-300"
-            :class="props.checked ? 'translate-x-6' : 'translate-x-0'"
+            class="pointer-events-none absolute top-1/2 left-1 size-6 -translate-y-1/2 rounded-full bg-white shadow-md ring-1 ring-black/5 transition-transform duration-300 ease-out"
+            :class="
+                props.checked
+                    ? 'translate-x-[calc(3.5rem-0.5rem-1.5rem)]'
+                    : 'translate-x-0'
+            "
             aria-hidden="true"
         />
     </button>

@@ -105,7 +105,7 @@ onUnmounted(() => {
             :aria-expanded="isOpen"
             :aria-haspopup="true"
             tabindex="0"
-            class="border-secondary-200 bg-secondary-50 hover:bg-secondary-100 focus-visible:ring-primary-400 dark:border-secondary-700 dark:bg-secondary-800 dark:hover:bg-secondary-700 dark:focus-visible:ring-offset-secondary-950 flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            class="focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 flex cursor-pointer items-center rounded-sm border-0 bg-transparent p-0 shadow-none transition hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-transparent dark:bg-transparent dark:hover:bg-transparent"
             @click="handleToggle"
             @keydown="handleKeyDown"
         >
@@ -116,12 +116,6 @@ onUnmounted(() => {
                 class="h-5 w-8 shrink-0 overflow-hidden rounded-sm object-cover"
                 width="32"
                 height="20"
-            />
-            <Icon
-                name="heroicons:chevron-down-20-solid"
-                class="text-secondary-600 dark:text-secondary-400 size-4 shrink-0 transition-transform duration-200"
-                :class="{ 'rotate-180': isOpen }"
-                aria-hidden="true"
             />
         </button>
 

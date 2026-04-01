@@ -37,6 +37,11 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const { isDarkGallery, setIsDarkGallery } = useProductGalleryBackground();
+
+function handleGalleryBackgroundChange(value: boolean): void {
+    setIsDarkGallery(value);
+}
 
 const categoryOptions: { value: ProductCategory | 'all'; labelKey: string }[] =
     [
@@ -152,6 +157,33 @@ function handleSortUpdate(value: string | number) {
     </h2>
 
     <div :class="[compact ? 'space-y-2' : 'space-y-5', hideTitle && 'pt-0']">
+        <div
+            class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 dark:border-slate-700 dark:bg-slate-800/50"
+            :class="compact ? 'py-1.5' : 'py-2.5'"
+        >
+            <div class="min-w-0 flex-1 pr-2">
+                <p
+                    class="text-sm font-medium text-slate-800 dark:text-slate-100"
+                >
+                    {{ t('categoriesFilterGalleryBackgroundLabel') }}
+                </p>
+                <p
+                    class="text-secondary-600 dark:text-secondary-400 mt-0.5 text-xs"
+                >
+                    {{ t('categoriesFilterGalleryBackgroundHint') }}
+                </p>
+            </div>
+            <div class="flex shrink-0 self-center">
+                <Switch
+                    :checked="isDarkGallery"
+                    :accessible-label="
+                        t('categoriesFilterGalleryBackgroundSwitchAria')
+                    "
+                    @update:checked="handleGalleryBackgroundChange"
+                />
+            </div>
+        </div>
+
         <div :class="compact ? 'space-y-1' : 'space-y-2'">
             <label
                 class="block text-base font-medium text-slate-700 dark:text-slate-300"

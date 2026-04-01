@@ -11,16 +11,14 @@ const product = computed<Product | undefined>(() =>
     getProductById(productId.value),
 );
 
+const { galleryImageContainerClasses } = useProductGalleryBackground();
+
 const productImages = computed(() => product.value?.images ?? []);
 const hasImages = computed(() => productImages.value.length > 0);
 const hasMultipleImages = computed(() => productImages.value.length > 1);
-const imageContainerClass = computed(() => {
-    if (product.value?.imageContainerTheme === 'default') {
-        return 'bg-secondary-100 dark:bg-secondary-800';
-    }
-
-    return 'bg-white dark:bg-white';
-});
+const imageContainerClass = computed(() =>
+    galleryImageContainerClasses({ withGroupHover: false }),
+);
 
 const activeImageIndex = ref(0);
 const slideDirection = ref<'left' | 'right'>('right');

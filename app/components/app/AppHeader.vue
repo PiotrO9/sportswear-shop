@@ -206,7 +206,7 @@ watch(
         @focusout="handleHeaderFocusOut"
     >
         <div
-            class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-8"
+            class="relative z-60 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-8"
         >
             <div class="flex min-w-0 flex-1 items-center gap-4 lg:flex-initial">
                 <NuxtLink
@@ -221,7 +221,7 @@ watch(
                         height="40"
                         loading="eager"
                         decoding="async"
-                        class="size-9 shrink-0 object-contain"
+                        class="size-7 shrink-0 object-contain"
                         aria-hidden="true"
                     />
                     Sportswear Shop

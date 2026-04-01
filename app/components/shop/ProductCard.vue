@@ -16,17 +16,14 @@ const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const { t } = useI18n();
+const { galleryImageContainerClasses } = useProductGalleryBackground();
 
 const productImages = computed(() => props.product.images ?? []);
 const hasImages = computed(() => productImages.value.length > 0);
 const hasMultipleImages = computed(() => productImages.value.length > 1);
-const imageContainerClass = computed(() => {
-    if (props.product.imageContainerTheme === 'default') {
-        return 'bg-secondary-100 dark:bg-secondary-800 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-700';
-    }
-
-    return 'bg-white dark:bg-white group-hover:bg-secondary-50 dark:group-hover:bg-secondary-50';
-});
+const imageContainerClass = computed(() =>
+    galleryImageContainerClasses({ withGroupHover: true }),
+);
 const imageInteractionClass = computed(() => {
     if (!hasMultipleImages.value) return undefined;
     if (isDragging.value) return 'cursor-grabbing select-none';

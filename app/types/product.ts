@@ -8,7 +8,8 @@ export type ProductColor = 'black' | 'white' | 'grey' | 'navy' | 'red' | 'blue';
 
 export type ProductSort = 'price-asc' | 'price-desc' | 'name-asc';
 
-export type ProductImageContainerTheme = 'default' | 'light';
+/** `default` — szare tło katalogowe; `light` — biała galeria; `dark` — ciemna galeria (np. czarny produkt na czarnym tle). */
+export type ProductImageContainerTheme = 'default' | 'light' | 'dark';
 
 export interface Product {
     id: string;
@@ -21,6 +22,5 @@ export interface Product {
     material: ProductMaterial;
     colors: ProductColor[];
     images?: string[];
-    /** Domyślnie białe tło; ustaw `default` dla szarego tła katalogowego. */
     imageContainerTheme?: ProductImageContainerTheme;
 }
