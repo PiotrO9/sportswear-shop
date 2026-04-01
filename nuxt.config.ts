@@ -16,7 +16,13 @@ export default defineNuxtConfig({
         '@nuxt/icon',
         '@nuxtjs/seo',
         '@nuxtjs/i18n',
+        'shadcn-nuxt',
     ],
+    shadcn: {
+        /** Prefiks zapobiega kolizji z istniejącymi komponentami w `~/components/ui` (np. Badge). */
+        prefix: 'Ui',
+        componentDir: '@/components/shadcn',
+    },
     supabase: {
         redirect: false,
     },
