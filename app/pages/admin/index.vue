@@ -3,15 +3,9 @@ definePageMeta({
     middleware: ['admin'],
 });
 
+const { t } = useI18n();
 const localePath = useLocalePath();
-const { listProducts } = useAdminProducts();
-const { listLowStock } = useAdminInventory();
-
-const isLoading = ref(true);
-const productsTotal = ref(0);
-const lowStockTotal = ref(0);
-const draftProductsTotal = ref(0);
-const errorMessage = ref('');
+const { handleLogout } = useLogout();
 
 const quickActions = computed(() => [
     {
@@ -31,37 +25,9 @@ const quickActions = computed(() => [
     },
 ]);
 
-async function handleLoadDashboard(): Promise<void> {
-    isLoading.value = true;
-    errorMessage.value = '';
-
-    try {
-        const [productsResponse, lowStockResponse] = await Promise.all([
-            listProducts({
-                page: 1,
-                pageSize: 100,
-            }),
-            listLowStock(),
-        ]);
-
-        productsTotal.value = productsResponse.total;
-        lowStockTotal.value = lowStockResponse.total;
-        draftProductsTotal.value = productsResponse.items.filter(
-            (item) => item.status === 'draft',
-        ).length;
-    } catch (error) {
-        const message =
-            error instanceof Error ? error.message : 'Nieznany błąd';
-
-        errorMessage.value = `Nie udało się załadować dashboardu: ${message}`;
-    } finally {
-        isLoading.value = false;
-    }
+function handleLogoutClick(): void {
+    handleLogout();
 }
-
-onMounted(() => {
-    handleLoadDashboard();
-});
 </script>
 
 <template>
@@ -69,6 +35,16 @@ onMounted(() => {
         title="Panel administratora"
         description="Szybki podgląd stanu katalogu i magazynu."
     >
+        <div class="flex flex-wrap items-center justify-end gap-2">
+            <Action
+                variant="secondary"
+                :aria-label="t('navLogOut')"
+                @click="handleLogoutClick"
+            >
+                {{ t('navLogOut') }}
+            </Action>
+        </div>
+
         <div class="grid gap-4 md:grid-cols-3">
             <Card aria-label="Liczba produktów">
                 <p class="text-secondary-500 dark:text-secondary-400 text-sm">
@@ -77,7 +53,7 @@ onMounted(() => {
                 <p
                     class="text-secondary-900 dark:text-secondary-50 mt-2 text-3xl font-bold"
                 >
-                    {{ isLoading ? '...' : productsTotal }}
+                    —
                 </p>
             </Card>
 
@@ -88,7 +64,7 @@ onMounted(() => {
                 <p
                     class="text-secondary-900 dark:text-secondary-50 mt-2 text-3xl font-bold"
                 >
-                    {{ isLoading ? '...' : lowStockTotal }}
+                    —
                 </p>
             </Card>
 
@@ -99,7 +75,7 @@ onMounted(() => {
                 <p
                     class="text-secondary-900 dark:text-secondary-50 mt-2 text-3xl font-bold"
                 >
-                    {{ isLoading ? '...' : draftProductsTotal }}
+                    —
                 </p>
             </Card>
         </div>
@@ -124,21 +100,6 @@ onMounted(() => {
                     {{ action.label }}
                 </NuxtLink>
             </div>
-        </Card>
-
-        <Card v-if="errorMessage" aria-label="Błąd ładowania dashboardu">
-            <p class="text-danger-600 dark:text-danger-300 text-sm">
-                {{ errorMessage }}
-            </p>
-            <template #footer>
-                <Action
-                    aria-label="Ponów ładowanie dashboardu"
-                    variant="secondary"
-                    @click="handleLoadDashboard"
-                >
-                    Odśwież
-                </Action>
-            </template>
         </Card>
     </AdminPanelShell>
 </template>

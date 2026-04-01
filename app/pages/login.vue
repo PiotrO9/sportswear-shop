@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { z } from 'zod';
 
+definePageMeta({
+    middleware: ['guest'],
+});
+
 const { t } = useI18n();
 const localePath = useLocalePath();
 
@@ -11,14 +15,7 @@ usePageMeta({
 
 const route = useRoute();
 const { addToast } = useToast();
-const {
-    isAuthenticated,
-    isMockEnabled,
-    session,
-    login,
-    mockAdminEmail,
-    mockAdminPassword,
-} = useAuthSession();
+const { isAuthenticated, session, login } = useAuthSession();
 const { handleLogout } = useLogout();
 
 const redirectQuerySchema = z.string().min(1).optional();
@@ -36,7 +33,7 @@ const isFormValid = computed(
 function resolveRedirectTarget(): string {
     const redirectQuery = route.query.redirect;
 
-    if (!redirectQuery) return localePath('/protected');
+    if (!redirectQuery) return localePath('/admin');
 
     if (Array.isArray(redirectQuery)) {
         const firstQuery = redirectQuery[0];
@@ -46,7 +43,7 @@ function resolveRedirectTarget(): string {
             return result.data;
         }
 
-        return localePath('/protected');
+        return localePath('/admin');
     }
 
     const result = redirectQuerySchema.safeParse(redirectQuery);
@@ -55,7 +52,7 @@ function resolveRedirectTarget(): string {
         return result.data;
     }
 
-    return localePath('/protected');
+    return localePath('/admin');
 }
 
 async function handleLogin() {
@@ -111,16 +108,6 @@ function handleGoHome() {
 function handleLogoutClick() {
     handleLogout();
 }
-
-async function handleLoginAsMockAdmin() {
-    if (isLoading.value || !isMockEnabled.value) {
-        return;
-    }
-
-    email.value = mockAdminEmail;
-    password.value = mockAdminPassword;
-    await handleLogin();
-}
 </script>
 
 <template>
@@ -160,24 +147,6 @@ async function handleLoginAsMockAdmin() {
                 </p>
 
                 <div v-if="!isAuthenticated" class="space-y-4">
-                    <div
-                        v-if="isMockEnabled"
-                        class="bg-primary-50 dark:bg-primary-950/30 border-primary-200 dark:border-primary-900 rounded-xl border p-3"
-                    >
-                        <p
-                            class="text-primary-800 dark:text-primary-300 text-sm font-semibold"
-                        >
-                            Konto testowe admina
-                        </p>
-                        <p
-                            class="text-primary-700 dark:text-primary-400 mt-1 text-xs"
-                        >
-                            E-mail: <strong>{{ mockAdminEmail }}</strong> |
-                            Hasło:
-                            <strong>{{ mockAdminPassword }}</strong>
-                        </p>
-                    </div>
-
                     <div class="space-y-2">
                         <label
                             class="block text-sm font-medium text-slate-700 dark:text-slate-300"
@@ -222,15 +191,6 @@ async function handleLoginAsMockAdmin() {
                         @click="handleLogin"
                     >
                         {{ isLoading ? t('loginLoggingIn') : t('navLogIn') }}
-                    </Action>
-                    <Action
-                        v-if="!isAuthenticated && isMockEnabled"
-                        variant="secondary"
-                        aria-label="Zaloguj testowym kontem administratora"
-                        :is-disabled="isLoading"
-                        @click="handleLoginAsMockAdmin"
-                    >
-                        Zaloguj jako Admin Demo
                     </Action>
                     <Action
                         v-if="isAuthenticated"

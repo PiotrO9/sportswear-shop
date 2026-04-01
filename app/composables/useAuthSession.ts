@@ -7,64 +7,47 @@ export interface AuthSession {
     role?: 'admin' | 'customer';
 }
 
-interface LoginResponse {
-    accessToken: string;
-    user: {
-        id: string;
-        userName: string;
-        email: string;
-    };
+interface SupabaseAuthUser {
+    id: string;
+    email?: string;
+    user_metadata?: Record<string, unknown>;
 }
 
-interface RefreshResponse {
-    accessToken: string;
-}
+function resolveUserName(user: SupabaseAuthUser): string {
+    const fullName = user.user_metadata?.full_name;
+    const name = user.user_metadata?.name;
+    const preferredName = user.user_metadata?.preferred_name;
 
-interface MeResponse {
-    user: {
-        id: string;
-        userName: string;
-        email: string;
-    };
-    accessToken?: string;
-}
-
-const MOCK_ADMIN_EMAIL = 'admin@mock.local';
-const MOCK_ADMIN_PASSWORD = 'Admin123!';
-const MOCK_ADMIN_COOKIE = 'admin_mock_session';
-
-function createMockAdminSession(): AuthSession {
-    return {
-        token: `mock_admin_${Date.now()}`,
-        userName: 'Admin Demo',
-        userId: 'mock-admin',
-        email: MOCK_ADMIN_EMAIL,
-        role: 'admin',
-    };
-}
-
-function isMockAdminCredentials(email: string, password: string): boolean {
-    if (!email || !password) {
-        return false;
+    if (typeof fullName === 'string' && fullName.trim().length > 0) {
+        return fullName.trim();
     }
 
-    return (
-        email.trim().toLowerCase() === MOCK_ADMIN_EMAIL &&
-        password.trim() === MOCK_ADMIN_PASSWORD
-    );
+    if (typeof name === 'string' && name.trim().length > 0) {
+        return name.trim();
+    }
+
+    if (typeof preferredName === 'string' && preferredName.trim().length > 0) {
+        return preferredName.trim();
+    }
+
+    if (typeof user.email === 'string' && user.email.trim().length > 0) {
+        return user.email.trim();
+    }
+
+    return 'User';
 }
 
-function createSessionFromResponse(
-    user: { id: string; userName: string; email: string },
+function createSessionFromSupabase(
+    user: SupabaseAuthUser,
     accessToken?: string,
 ): AuthSession {
     if (accessToken) {
-        const decoded = decodeJwt(accessToken) as JwtPayload;
-        const expiresAt = decoded.exp ? decoded.exp * 1000 : undefined;
+        const decoded = decodeJwt(accessToken);
+        const expiresAt = decoded?.exp ? decoded.exp * 1000 : undefined;
 
         return {
             token: accessToken,
-            userName: user.userName,
+            userName: resolveUserName(user),
             userId: user.id,
             email: user.email,
             expiresAt,
@@ -72,27 +55,28 @@ function createSessionFromResponse(
     }
 
     return {
-        token: 'valid',
-        userName: user.userName,
+        token: '',
+        userName: resolveUserName(user),
         userId: user.id,
         email: user.email,
     };
 }
 
 export function useAuthSession() {
-    const config = useRuntimeConfig();
-    const apiBase = config.public.apiBase || '/api';
-    const isMockEnabled = Boolean(config.public.enableAdminMock);
-    const adminMockSessionCookie = useCookie<string | null>(MOCK_ADMIN_COOKIE, {
-        sameSite: 'lax',
-        path: '/',
-    });
+    const supabase = useSupabaseClient();
+    const supabaseUser = useSupabaseUser();
 
     const session = useState<AuthSession | null>('auth_session', () => null);
     const isCheckingSession = ref(false);
 
     const isAuthenticated = computed(() => {
-        if (!session.value?.token) return false;
+        if (!session.value?.userId) {
+            return false;
+        }
+
+        if (!session.value.token) {
+            return true;
+        }
 
         if (isTokenExpired(session.value.token)) {
             return false;
@@ -107,23 +91,32 @@ export function useAuthSession() {
         isCheckingSession.value = true;
 
         try {
-            if (isMockEnabled && adminMockSessionCookie.value === '1') {
-                session.value = createMockAdminSession();
+            const currentUser = supabaseUser.value as SupabaseAuthUser | null;
+
+            if (currentUser) {
+                const { data: sessionData } = await supabase.auth.getSession();
+
+                session.value = createSessionFromSupabase(
+                    currentUser,
+                    sessionData.session?.access_token,
+                );
 
                 return true;
             }
 
-            const response = await $fetch<MeResponse>(`${apiBase}/auth/me`, {
-                method: 'GET',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const { data, error } = await supabase.auth.getUser();
 
-            session.value = createSessionFromResponse(
-                response.user,
-                response.accessToken,
+            if (error || !data.user) {
+                session.value = null;
+
+                return false;
+            }
+
+            const { data: refreshedSession } = await supabase.auth.getSession();
+
+            session.value = createSessionFromSupabase(
+                data.user,
+                refreshedSession.session?.access_token,
             );
 
             return true;
@@ -141,51 +134,35 @@ export function useAuthSession() {
             throw new Error('Email and password are required');
         }
 
-        if (isMockEnabled && isMockAdminCredentials(email, password)) {
-            adminMockSessionCookie.value = '1';
-            session.value = createMockAdminSession();
-
-            return;
-        }
-
-        const response = await $fetch<LoginResponse>(`${apiBase}/auth/login`, {
-            method: 'POST',
-            credentials: 'include',
-            body: { email, password },
-            headers: {
-                'Content-Type': 'application/json',
-            },
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
 
-        session.value = createSessionFromResponse(
-            response.user,
-            response.accessToken,
+        if (error || !data.user) {
+            throw new Error(error?.message || 'Login failed');
+        }
+
+        session.value = createSessionFromSupabase(
+            data.user,
+            data.session?.access_token,
         );
     }
 
     async function refreshAccessToken(): Promise<boolean> {
         try {
-            const response = await $fetch<RefreshResponse>(
-                `${apiBase}/auth/refresh`,
-                {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                },
-            );
+            const { data, error } = await supabase.auth.refreshSession();
 
-            const decoded = decodeJwt(response.accessToken) as JwtPayload;
-            const expiresAt = decoded.exp ? decoded.exp * 1000 : undefined;
+            if (error || !data.session?.user) {
+                session.value = null;
 
-            if (session.value) {
-                session.value = {
-                    ...session.value,
-                    token: response.accessToken,
-                    expiresAt,
-                };
+                return false;
             }
+
+            session.value = createSessionFromSupabase(
+                data.session.user,
+                data.session.access_token,
+            );
 
             return true;
         } catch {
@@ -196,43 +173,43 @@ export function useAuthSession() {
     }
 
     async function logout(): Promise<void> {
-        adminMockSessionCookie.value = null;
-
-        if (apiBase) {
-            try {
-                await $fetch(`${apiBase}/auth/logout`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-            } catch (error) {
-                console.error(error);
-            }
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            session.value = null;
         }
-
-        session.value = null;
     }
 
-    function loginDemo(userName: string) {
-        if (!userName) return;
+    watch(
+        supabaseUser,
+        async (value) => {
+            const currentUser = value as SupabaseAuthUser | null;
 
-        session.value = {
-            token: `demo_${Date.now()}`,
-            userName,
-        };
-    }
+            if (!currentUser) {
+                session.value = null;
+
+                return;
+            }
+
+            const { data } = await supabase.auth.getSession();
+
+            session.value = createSessionFromSupabase(
+                currentUser,
+                data.session?.access_token,
+            );
+        },
+        {
+            immediate: true,
+        },
+    );
 
     return {
         session,
         isAuthenticated,
         isCheckingSession: computed(() => isCheckingSession.value),
-        isMockEnabled: computed(() => isMockEnabled),
-        mockAdminEmail: MOCK_ADMIN_EMAIL,
-        mockAdminPassword: MOCK_ADMIN_PASSWORD,
         login,
-        loginDemo,
         logout,
         refreshAccessToken,
         checkSession,

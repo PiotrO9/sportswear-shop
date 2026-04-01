@@ -5,24 +5,18 @@ interface ProfileRoleRow {
     role: string;
 }
 
+interface SupabaseUserLike {
+    id?: string;
+    sub?: string;
+}
+
 export interface AdminContext {
     userId: string;
     role: string;
 }
 
 export async function requireAdmin(event: H3Event): Promise<AdminContext> {
-    const config = useRuntimeConfig(event);
-    const isMockEnabled = Boolean(config.public.enableAdminMock);
-    const adminMockSession = getCookie(event, 'admin_mock_session');
-
-    if (isMockEnabled && adminMockSession === '1') {
-        return {
-            userId: 'mock-admin',
-            role: 'admin',
-        };
-    }
-
-    const user = await serverSupabaseUser(event);
+    const user = (await serverSupabaseUser(event)) as SupabaseUserLike | null;
 
     if (!user) {
         throw createError({
@@ -31,11 +25,20 @@ export async function requireAdmin(event: H3Event): Promise<AdminContext> {
         });
     }
 
+    const userId = user.id || user.sub;
+
+    if (!userId) {
+        throw createError({
+            statusCode: 401,
+            statusMessage: 'Invalid auth session',
+        });
+    }
+
     const client = await serverSupabaseClient(event);
     const { data, error } = await client
         .from('profiles')
         .select('role')
-        .eq('id', user.id)
+        .eq('id', userId)
         .maybeSingle<ProfileRoleRow>();
 
     if (error) {
@@ -54,7 +57,7 @@ export async function requireAdmin(event: H3Event): Promise<AdminContext> {
     }
 
     return {
-        userId: user.id,
+        userId,
         role: data.role,
     };
 }

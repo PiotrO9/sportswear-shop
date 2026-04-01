@@ -13,7 +13,8 @@ const title = computed(() => {
 
     if (activeStatusCode === 404) return t('errorPageNotFound');
 
-    if (activeStatusCode) return t('errorTitle', { statusCode: activeStatusCode });
+    if (activeStatusCode)
+        return t('errorTitle', { statusCode: activeStatusCode });
 
     return t('errorSomethingWentWrong');
 });
@@ -47,7 +48,9 @@ function handleTryAgain() {
                 class="text-secondary-600 dark:text-secondary-300 mt-3 text-base"
             >
                 {{
-                    is404 ? t('error404Description') : t('errorDefaultDescription')
+                    is404
+                        ? t('error404Description')
+                        : t('errorDefaultDescription')
                 }}
             </p>
             <div class="mt-8 flex items-center justify-center gap-3">

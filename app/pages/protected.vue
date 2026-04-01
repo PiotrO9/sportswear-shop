@@ -51,13 +51,6 @@ function handleGoAdmin() {
                         >{{ session?.userName }}</span
                     >
                 </p>
-                <p class="break-all text-slate-600 dark:text-slate-300">
-                    {{ t('protectedToken') }}
-                    <span
-                        class="font-mono text-slate-700 dark:text-slate-300"
-                        >{{ session?.token }}</span
-                    >
-                </p>
             </div>
 
             <template #footer>

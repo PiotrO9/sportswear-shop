@@ -1,12 +1,23 @@
 export default defineNuxtRouteMiddleware(async () => {
     const localePath = useLocalePath();
+    const { isAuthenticated, checkSession } = useAuthSession();
     const { checkAdminAccess } = useAdminSession();
 
-    const hasAccess = await checkAdminAccess();
+    if (!isAuthenticated.value) {
+        const hasSession = await checkSession();
 
-    if (hasAccess) {
+        if (!hasSession) {
+            return navigateTo(localePath('/login'));
+        }
+    }
+
+    const hasAdminAccess = await checkAdminAccess();
+
+    console.log(hasAdminAccess);
+
+    if (hasAdminAccess) {
         return;
     }
 
-    return navigateTo(localePath('/login'));
+    return navigateTo(localePath('/protected'));
 });
