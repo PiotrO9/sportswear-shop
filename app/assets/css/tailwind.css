@@ -2,7 +2,19 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+    /* Impact globalnie: system (Windows/macOS); Anton z Google Fonts jako fallback (app.vue). */
+    --font-sans: 'Anton', Impact, Haettenschweiler, 'Franklin Gothic Bold', 'Arial Narrow Bold', 'Anton', ui-sans-serif, sans-serif;
+
+    /*
+     * Domyślne wartości Tailwinda dla tracking-tight/tighter są ujemne; klasy w warstwie utilities
+     * i tak nadpisują letter-spacing z html — ustawiamy skalę na dodatnią, spójną z base (0.045em).
+     */
+    --tracking-tighter: 0.035em;
+    --tracking-tight: 0.045em;
+    --tracking-normal: 0.045em;
+    --tracking-wide: 0.065em;
+    --tracking-wider: 0.085em;
+    --tracking-widest: 0.12em;
 
     --color-primary: #ab1f1c;
     --color-primary-50: #fdf2f2;
@@ -81,4 +93,10 @@
     --color-info-800: #1e40af;
     --color-info-900: #1e3a8a;
     --color-info-950: #172554;
+}
+
+@layer base {
+    html {
+        letter-spacing: var(--tracking-normal);
+    }
 }
