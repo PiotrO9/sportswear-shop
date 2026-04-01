@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type {
     ProductCategory,
-    ProductMaterial,
     ProductSize,
     ProductSort,
 } from '~/types/product';
@@ -11,7 +10,6 @@ interface Props {
     filterMinPrice: string;
     filterMaxPrice: string;
     filterSize: ProductSize | null;
-    filterMaterial: ProductMaterial | 'all';
     filterSort: ProductSort;
     idPrefix?: string;
     compact?: boolean;
@@ -28,7 +26,6 @@ const emit = defineEmits<{
     'update:filterMinPrice': [value: string];
     'update:filterMaxPrice': [value: string];
     'update:filterSize': [value: ProductSize | null];
-    'update:filterMaterial': [value: ProductMaterial | 'all'];
     'update:filterSort': [value: ProductSort];
     reset: [];
 }>();
@@ -47,15 +44,6 @@ const categoryOptions: { value: ProductCategory | 'all'; labelKey: string }[] =
         { value: 'women', labelKey: 'navWomen' },
         { value: 'kids', labelKey: 'navKids' },
         { value: 'sport', labelKey: 'navSport' },
-    ];
-
-const materialOptions: { value: ProductMaterial | 'all'; labelKey: string }[] =
-    [
-        { value: 'all', labelKey: 'categoriesFilterMaterialAll' },
-        { value: 'cotton', labelKey: 'creatorOptionCotton' },
-        { value: 'polyester', labelKey: 'creatorOptionPolyester' },
-        { value: 'blend', labelKey: 'creatorOptionBlend' },
-        { value: 'lycra', labelKey: 'creatorOptionLycra' },
     ];
 
 const sortOptions: { value: ProductSort; labelKey: string }[] = [
@@ -91,12 +79,6 @@ function handleCategoryChange(event: Event) {
     emit('update:filterCategory', target.value as ProductCategory | 'all');
 }
 
-function handleMaterialChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-
-    emit('update:filterMaterial', target.value as ProductMaterial | 'all');
-}
-
 function handleSortChange(event: Event) {
     const target = event.target as HTMLSelectElement;
 
@@ -113,10 +95,6 @@ function handleMinPriceUpdate(value: string | number) {
 
 function handleMaxPriceUpdate(value: string | number) {
     emit('update:filterMaxPrice', String(value));
-}
-
-function handleMaterialUpdate(value: string | number) {
-    emit('update:filterMaterial', value as ProductMaterial | 'all');
 }
 
 function handleSortUpdate(value: string | number) {
@@ -250,47 +228,6 @@ function handleSortUpdate(value: string | number) {
                     {{ size }}
                 </option>
             </select>
-        </div>
-
-        <div :class="compact ? 'space-y-1' : 'space-y-2'">
-            <label
-                class="block text-base font-medium text-slate-700 dark:text-slate-300"
-                :for="`${idPrefix}-material`"
-            >
-                {{ t('categoriesFilterMaterial') }}
-            </label>
-            <select
-                v-if="compact"
-                :id="`${idPrefix}-material`"
-                :value="filterMaterial"
-                :class="selectClass"
-                :aria-label="t('categoriesFilterMaterial')"
-                @change="handleMaterialChange"
-            >
-                <option
-                    v-for="opt in materialOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                >
-                    {{ t(opt.labelKey) }}
-                </option>
-            </select>
-            <RadioGroup
-                v-else
-                :model-value="filterMaterial"
-                :aria-label="t('categoriesFilterMaterial')"
-                orientation="vertical"
-                @update:model-value="handleMaterialUpdate($event)"
-            >
-                <Radio
-                    v-for="opt in materialOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                    :aria-label="t(opt.labelKey)"
-                >
-                    {{ t(opt.labelKey) }}
-                </Radio>
-            </RadioGroup>
         </div>
 
         <div :class="compact ? 'space-y-1' : 'space-y-2'">

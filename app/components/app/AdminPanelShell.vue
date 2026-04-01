@@ -24,22 +24,22 @@ const dashboardPath = computed(() => localePath('/admin'));
 const navItems = computed<AdminNavItem[]>(() => [
     {
         to: dashboardPath.value,
-        label: 'Dashboard',
+        label: t('adminNavDashboard'),
         icon: 'heroicons:squares-2x2',
     },
     {
         to: localePath('/admin/products'),
-        label: 'Produkty',
+        label: t('adminNavProducts'),
         icon: 'heroicons:cube',
     },
     {
         to: localePath('/admin/products/new'),
-        label: 'Dodaj produkt',
+        label: t('adminNavAddProduct'),
         icon: 'heroicons:plus-circle',
     },
     {
         to: localePath('/admin/inventory'),
-        label: 'Magazyn',
+        label: t('adminNavInventory'),
         icon: 'heroicons:archive-box',
     },
 ]);
@@ -102,16 +102,16 @@ function handleLogoutClick(): void {
             <aside class="lg:sticky lg:top-4">
                 <div
                     :class="asidePanelClass()"
-                    aria-label="Nawigacja panelu administratora"
+                    :aria-label="t('adminNavAsideLabel')"
                 >
                     <p
                         class="text-muted-foreground px-2 pb-2 text-xs font-medium tracking-wide uppercase"
                     >
-                        Menu
+                        {{ t('adminNavMenuHeading') }}
                     </p>
                     <nav
                         class="flex flex-col gap-1"
-                        aria-label="Panel administratora"
+                        :aria-label="t('adminNavMainLabel')"
                     >
                         <Button
                             v-for="item in navItems"
@@ -130,7 +130,9 @@ function handleLogoutClick(): void {
                                         ? 'page'
                                         : undefined
                                 "
-                                :aria-label="`Przejdź do ${item.label}`"
+                                :aria-label="
+                                    t('adminNavGoTo', { label: item.label })
+                                "
                             >
                                 <Icon
                                     :name="item.icon"

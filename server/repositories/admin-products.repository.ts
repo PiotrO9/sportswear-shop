@@ -18,7 +18,6 @@ interface ProductRow {
     price: number;
     category: string;
     subcategory: string | null;
-    material: string;
     status: 'draft' | 'active' | 'archived';
     updated_at: string;
 }
@@ -56,7 +55,6 @@ function mapProductBase(row: ProductRow) {
         price: row.price,
         category: row.category,
         subcategory: row.subcategory,
-        material: row.material,
         status: row.status,
         updatedAt: row.updated_at,
     } as const;
@@ -75,7 +73,7 @@ export async function listAdminProductsRepository(
     let builder = client
         .from('products')
         .select(
-            'id,name,slug,sku,description,price,category,subcategory,material,status,updated_at',
+            'id,name,slug,sku,description,price,category,subcategory,status,updated_at',
             { count: 'exact' },
         )
         .range(from, to)
@@ -218,7 +216,7 @@ export async function getAdminProductByIdRepository(
     const { data: productRow, error: productError } = await client
         .from('products')
         .select(
-            'id,name,slug,sku,description,price,category,subcategory,material,status,updated_at',
+            'id,name,slug,sku,description,price,category,subcategory,status,updated_at',
         )
         .eq('id', productId)
         .maybeSingle<ProductRow>();
@@ -309,7 +307,6 @@ export async function createAdminProductRepository(
             price: input.price,
             category: input.category,
             subcategory: input.subcategory ?? null,
-            material: input.material,
             status: input.status ?? 'draft',
         })
         .select('id')
@@ -397,9 +394,6 @@ export async function updateAdminProductRepository(
                 : {}),
             ...(input.subcategory !== undefined
                 ? { subcategory: input.subcategory }
-                : {}),
-            ...(input.material !== undefined
-                ? { material: input.material }
                 : {}),
             ...(input.status !== undefined ? { status: input.status } : {}),
         })

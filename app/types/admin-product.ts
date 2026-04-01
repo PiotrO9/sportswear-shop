@@ -1,8 +1,4 @@
-import type {
-    ProductCategory,
-    ProductMaterial,
-    ProductSize,
-} from '~/types/product';
+import type { ProductCategory, ProductSize } from '~/types/product';
 
 export type AdminProductStatus = 'draft' | 'active' | 'archived';
 
@@ -65,7 +61,6 @@ export interface AdminProductBase {
     price: number;
     category: ProductCategory;
     subcategory: string | null;
-    material: ProductMaterial;
     status: AdminProductStatus;
     updatedAt: string;
 }
@@ -113,7 +108,6 @@ export interface CreateAdminProductInput {
     price: number;
     category: ProductCategory;
     subcategory?: string | null;
-    material: ProductMaterial;
     status?: AdminProductStatus;
     options: ProductOptionSet;
     variants: CreateProductVariantInput[];
@@ -127,7 +121,6 @@ export interface UpdateAdminProductInput {
     price?: number;
     category?: ProductCategory;
     subcategory?: string | null;
-    material?: ProductMaterial;
     status?: AdminProductStatus;
 }
 

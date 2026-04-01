@@ -1,7 +1,6 @@
 import type {
     Product,
     ProductCategory,
-    ProductMaterial,
     ProductSize,
     ProductSort,
 } from '~/types/product';
@@ -78,7 +77,6 @@ function rashguardShortSleeveMockProduct(
         category: 'men',
         subcategory: 'rashguard-short-sleeve',
         sizes: ['S', 'M', 'L', 'XL'],
-        material: 'lycra',
         images: [
             `${basePath}/${prefix}-front.webp`,
             `${basePath}/${prefix}-back.webp`,
@@ -98,7 +96,6 @@ export function useCategoriesProducts() {
         minPrice: number,
         maxPrice: number,
         size: ProductSize | null,
-        material: ProductMaterial | 'all',
         sort: ProductSort,
         subcategory: string | null = null,
     ): Product[] {
@@ -120,10 +117,6 @@ export function useCategoriesProducts() {
             }
 
             if (size && !product.sizes.includes(size)) {
-                return false;
-            }
-
-            if (material !== 'all' && product.material !== material) {
                 return false;
             }
 

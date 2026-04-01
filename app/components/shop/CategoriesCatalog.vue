@@ -2,7 +2,6 @@
 import ProductCard from '~/components/shop/ProductCard.vue';
 import type {
     ProductCategory,
-    ProductMaterial,
     ProductSize,
     ProductSort,
 } from '~/types/product';
@@ -25,7 +24,6 @@ const filterCategory = ref<ProductCategory | 'all'>(props.initialCategory);
 const filterMinPrice = ref<string>('0');
 const filterMaxPrice = ref<string>('500');
 const filterSize = ref<ProductSize | null>(null);
-const filterMaterial = ref<ProductMaterial | 'all'>('all');
 const filterSort = ref<ProductSort>('price-asc');
 const currentPage = ref(1);
 const isFiltersDrawerOpen = ref(false);
@@ -38,7 +36,6 @@ const filteredProducts = computed(() =>
         Number.parseFloat(filterMinPrice.value) || 0,
         Number.parseFloat(filterMaxPrice.value) || 500,
         filterSize.value,
-        filterMaterial.value,
         filterSort.value,
         props.initialSubcategory,
     ),
@@ -62,14 +59,7 @@ watch(
 );
 
 watch(
-    [
-        filterCategory,
-        filterMinPrice,
-        filterMaxPrice,
-        filterSize,
-        filterMaterial,
-        filterSort,
-    ],
+    [filterCategory, filterMinPrice, filterMaxPrice, filterSize, filterSort],
     () => {
         currentPage.value = 1;
     },
@@ -80,7 +70,6 @@ function handleResetFilters() {
     filterMinPrice.value = '0';
     filterMaxPrice.value = '500';
     filterSize.value = null;
-    filterMaterial.value = 'all';
     filterSort.value = 'price-asc';
 }
 
@@ -186,7 +175,6 @@ function handleAddToCart(payload: { product: { name: string }; size: string }) {
                     v-model:filter-min-price="filterMinPrice"
                     v-model:filter-max-price="filterMaxPrice"
                     v-model:filter-size="filterSize"
-                    v-model:filter-material="filterMaterial"
                     v-model:filter-sort="filterSort"
                     id-prefix="filter-desktop"
                     :compact="true"
@@ -203,7 +191,6 @@ function handleAddToCart(payload: { product: { name: string }; size: string }) {
                     v-model:filter-min-price="filterMinPrice"
                     v-model:filter-max-price="filterMaxPrice"
                     v-model:filter-size="filterSize"
-                    v-model:filter-material="filterMaterial"
                     v-model:filter-sort="filterSort"
                     id-prefix="filter-mobile"
                     :hide-title="true"

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 const productCategorySchema = z.enum(['men', 'women', 'kids', 'sport']);
-const productMaterialSchema = z.enum(['cotton', 'polyester', 'blend', 'lycra']);
 const productSizeSchema = z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL']);
 const adminProductStatusSchema = z.enum(['draft', 'active', 'archived']);
 
@@ -35,11 +34,10 @@ export const createAdminProductSchema = z.object({
         .max(180)
         .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
     sku: z.string().trim().min(1).max(120),
-    description: z.string().trim().max(2000).nullable().optional(),
+    description: z.string().trim().max(50000).nullable().optional(),
     price: z.number().nonnegative(),
     category: productCategorySchema,
     subcategory: z.string().trim().max(120).nullable().optional(),
-    material: productMaterialSchema,
     status: adminProductStatusSchema.default('draft'),
     options: z.object({
         sizes: z.array(productSizeSchema).min(1),
@@ -69,11 +67,10 @@ export const updateAdminProductSchema = z
             .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
             .optional(),
         sku: z.string().trim().min(1).max(120).optional(),
-        description: z.string().trim().max(2000).nullable().optional(),
+        description: z.string().trim().max(50000).nullable().optional(),
         price: z.number().nonnegative().optional(),
         category: productCategorySchema.optional(),
         subcategory: z.string().trim().max(120).nullable().optional(),
-        material: productMaterialSchema.optional(),
         status: adminProductStatusSchema.optional(),
     })
     .refine((value) => Object.keys(value).length > 0, {

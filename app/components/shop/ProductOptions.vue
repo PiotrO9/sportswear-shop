@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Product, ProductMaterial, ProductSize } from '~/types/product';
+import type { Product, ProductSize } from '~/types/product';
 
 interface Props {
     product: Product;
@@ -27,13 +27,6 @@ const sizeLabelKeyMap: Record<ProductSize, string> = {
     L: 'creatorOptionL',
     XL: 'creatorOptionXl',
     XXL: 'creatorOptionXxl',
-};
-
-const materialLabelKeyMap: Record<ProductMaterial, string> = {
-    cotton: 'creatorOptionCotton',
-    polyester: 'creatorOptionPolyester',
-    blend: 'creatorOptionBlend',
-    lycra: 'creatorOptionLycra',
 };
 
 const categoryLabelKeyMap: Record<Product['category'], string> = {

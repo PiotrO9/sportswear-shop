@@ -13,7 +13,6 @@ import {
     CircleDashed,
 } from 'lucide-vue-next';
 import { computed, h, ref, watch } from 'vue';
-import AdminProductsTableReviewerMenu from '~/components/app/AdminProductsTableReviewerMenu.vue';
 import AdminProductsTableRowActions from '~/components/app/AdminProductsTableRowActions.vue';
 import { Badge } from '@/components/shadcn/badge';
 import { Button } from '@/components/shadcn/button';
@@ -35,19 +34,29 @@ import {
 } from '@/components/shadcn/table';
 import { valueUpdater } from '@/lib/utils';
 
-const props = defineProps<{
-    items: AdminProductListItem[];
-    isLoading: boolean;
-    page: number;
-    pageSize: number;
-    totalCount: number;
-    totalPages: number;
-}>();
+const props = withDefaults(
+    defineProps<{
+        items: AdminProductListItem[];
+        isLoading: boolean;
+        page: number;
+        pageSize: number;
+        totalCount: number;
+        totalPages: number;
+        /** Id produktu w trakcie publikacji (draft → aktywny), żeby zablokować przycisk */
+        publishingProductId?: string | null;
+    }>(),
+    {
+        publishingProductId: null,
+    },
+);
 
 const emit = defineEmits<{
     'update:page': [page: number];
     'update:pageSize': [size: number];
+    'publish-draft': [productId: string];
 }>();
+
+const { t, locale } = useI18n();
 
 const rowSelection = ref<Record<string, boolean>>({});
 
@@ -55,29 +64,52 @@ const pageSizeOptions = [10, 20, 50] as const;
 
 function formatCategoryLabel(category: ProductCategory): string {
     const map: Record<ProductCategory, string> = {
-        men: 'Mężczyźni',
-        women: 'Kobiety',
-        kids: 'Dzieci',
-        sport: 'Sport',
+        men: t('navMen'),
+        women: t('navWomen'),
+        kids: t('navKids'),
+        sport: t('navSport'),
     };
 
     return map[category];
 }
 
 function formatStatusLabel(status: AdminProductListItem['status']): string {
-    if (status === 'draft') return 'Draft';
+    if (status === 'draft') return t('adminStatusDraft');
 
-    if (status === 'active') return 'Aktywny';
+    if (status === 'active') return t('adminStatusActive');
 
-    return 'Archiwalny';
+    return t('adminStatusArchived');
 }
 
 function formatPrice(value: number): string {
-    return new Intl.NumberFormat('pl-PL', {
+    const tag = String(locale.value).toLowerCase().startsWith('pl')
+        ? 'pl-PL'
+        : 'en-US';
+
+    return new Intl.NumberFormat(tag, {
         style: 'currency',
         currency: 'PLN',
         minimumFractionDigits: 2,
     }).format(value);
+}
+
+function variantNoun(count: number): string {
+    if (count === 1) {
+        return t('adminVariantSingular');
+    }
+
+    if (String(locale.value).toLowerCase().startsWith('pl')) {
+        const c = count % 10;
+        const c100 = count % 100;
+
+        if (c >= 2 && c <= 4 && (c100 < 12 || c100 > 14)) {
+            return t('adminVariantPluralFew');
+        }
+
+        return t('adminVariantPluralMany');
+    }
+
+    return t('adminVariantPluralMany');
 }
 
 function renderStatusCell(row: AdminProductListItem) {
@@ -110,13 +142,13 @@ function renderStatusCell(row: AdminProductListItem) {
     ]);
 }
 
-const columns: ColumnDef<AdminProductListItem>[] = [
+const columns = computed<ColumnDef<AdminProductListItem>[]>(() => [
     {
         id: 'select',
         header: ({ table }) =>
             h('div', { class: 'flex items-center pl-1' }, [
                 h(Checkbox, {
-                    ariaLabel: 'Zaznacz wszystkie wiersze na stronie',
+                    ariaLabel: t('adminSelectAllRowsAria'),
                     modelValue:
                         table.getIsAllPageRowsSelected() ||
                         (table.getIsSomePageRowsSelected() && 'indeterminate'),
@@ -127,7 +159,9 @@ const columns: ColumnDef<AdminProductListItem>[] = [
         cell: ({ row }) =>
             h('div', { class: 'flex items-center' }, [
                 h(Checkbox, {
-                    ariaLabel: `Zaznacz wiersz ${row.original.name}`,
+                    ariaLabel: t('adminSelectRowAria', {
+                        name: row.original.name,
+                    }),
                     modelValue: row.getIsSelected(),
                     'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
                         row.toggleSelected(!!value),
@@ -139,7 +173,11 @@ const columns: ColumnDef<AdminProductListItem>[] = [
     {
         accessorKey: 'name',
         header: () =>
-            h('span', { class: 'font-semibold text-foreground' }, 'Nazwa'),
+            h(
+                'span',
+                { class: 'font-semibold text-foreground' },
+                t('adminColumnName'),
+            ),
         cell: ({ row }) =>
             h('div', { class: 'max-w-[240px] sm:max-w-xs' }, [
                 h('div', { class: 'truncate font-medium' }, row.original.name),
@@ -154,7 +192,7 @@ const columns: ColumnDef<AdminProductListItem>[] = [
     },
     {
         accessorKey: 'category',
-        header: 'Kategoria',
+        header: t('adminColumnCategory'),
         cell: ({ row }) =>
             h(Badge, { variant: 'outline', class: 'font-normal' }, () =>
                 formatCategoryLabel(row.original.category),
@@ -162,12 +200,17 @@ const columns: ColumnDef<AdminProductListItem>[] = [
     },
     {
         accessorKey: 'status',
-        header: 'Status',
+        header: t('adminColumnStatus'),
         cell: ({ row }) => renderStatusCell(row.original),
     },
     {
         accessorKey: 'price',
-        header: () => h('div', { class: 'text-right tabular-nums' }, 'Cena'),
+        header: () =>
+            h(
+                'div',
+                { class: 'text-right tabular-nums' },
+                t('adminColumnPrice'),
+            ),
         cell: ({ row }) =>
             h(
                 'div',
@@ -178,15 +221,14 @@ const columns: ColumnDef<AdminProductListItem>[] = [
     {
         accessorKey: 'totalStock',
         header: () =>
-            h('div', { class: 'text-right tabular-nums' }, 'Stan magazynowy'),
+            h(
+                'div',
+                { class: 'text-right tabular-nums' },
+                t('adminColumnStock'),
+            ),
         cell: ({ row }) => {
             const p = row.original;
-            const variantWord =
-                p.variantsCount === 1
-                    ? 'wariant'
-                    : p.variantsCount < 5
-                      ? 'warianty'
-                      : 'wariantów';
+            const variantWord = variantNoun(p.variantsCount);
 
             return h('div', { class: 'text-right text-sm tabular-nums' }, [
                 h('div', {}, [
@@ -194,7 +236,7 @@ const columns: ColumnDef<AdminProductListItem>[] = [
                     h(
                         'span',
                         { class: 'text-muted-foreground ml-1 text-xs' },
-                        'szt.',
+                        t('adminPcsSuffix'),
                     ),
                 ]),
                 h(
@@ -211,39 +253,41 @@ const columns: ColumnDef<AdminProductListItem>[] = [
                               class: 'mt-1 text-xs font-medium text-amber-600 dark:text-amber-400',
                               role: 'status',
                           },
-                          `Niski stan: ${p.lowStockVariantsCount}/${p.variantsCount}`,
+                          t('adminLowStockShort', {
+                              low: p.lowStockVariantsCount,
+                              total: p.variantsCount,
+                          }),
                       )
                     : null,
             ]);
         },
     },
     {
-        id: 'reviewer',
-        header: 'Recenzent',
-        cell: ({ row }) =>
-            h(AdminProductsTableReviewerMenu, {
-                productName: row.original.name,
-            }),
-        enableSorting: false,
-    },
-    {
         id: 'actions',
         enableHiding: false,
         cell: ({ row }) =>
             h(AdminProductsTableRowActions, {
+                productId: row.original.id,
                 productName: row.original.name,
                 editTo: `/admin/products/${row.original.id}`,
+                status: row.original.status,
+                isPublishing: props.publishingProductId === row.original.id,
+                onPublishDraft: (id: string) => emit('publish-draft', id),
             }),
     },
-];
+]);
 
 const table = useVueTable({
     data: computed(() => props.items),
-    columns,
+    get columns() {
+        return columns.value;
+    },
     getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    pageCount: computed(() => props.totalPages),
+    get pageCount() {
+        return props.totalPages;
+    },
     onRowSelectionChange: (updater) => valueUpdater(updater, rowSelection),
     state: {
         get rowSelection() {
@@ -318,7 +362,7 @@ const selectedOnPageCount = computed(
     <div
         class="bg-card text-card-foreground border-border w-full overflow-hidden rounded-lg border"
         role="region"
-        aria-label="Tabela produktów"
+        :aria-label="t('adminTableProductsAria')"
     >
         <Table>
             <TableHeader>
@@ -344,21 +388,20 @@ const selectedOnPageCount = computed(
                 <template v-if="isLoading">
                     <TableRow>
                         <TableCell
-                            colspan="8"
+                            colspan="7"
                             class="text-muted-foreground h-24 text-center text-sm"
                         >
-                            Wczytywanie produktów…
+                            {{ t('adminTableLoading') }}
                         </TableCell>
                     </TableRow>
                 </template>
                 <template v-else-if="items.length === 0">
                     <TableRow>
                         <TableCell
-                            colspan="8"
+                            colspan="7"
                             class="text-muted-foreground h-24 text-center text-sm"
                         >
-                            Brak produktów do wyświetlenia. Dodaj pierwszy
-                            produkt lub zmień filtry.
+                            {{ t('adminTableEmpty') }}
                         </TableCell>
                     </TableRow>
                 </template>
@@ -390,7 +433,12 @@ const selectedOnPageCount = computed(
             class="border-border flex flex-col gap-4 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
         >
             <p class="text-muted-foreground text-sm tabular-nums" role="status">
-                {{ selectedOnPageCount }} z {{ totalCount }} wierszy zaznaczono
+                {{
+                    t('adminTableSelectionStatus', {
+                        selected: selectedOnPageCount,
+                        total: totalCount,
+                    })
+                }}
             </p>
 
             <div
@@ -401,14 +449,14 @@ const selectedOnPageCount = computed(
                         id="adminProductsPageSizeLabel"
                         class="text-muted-foreground text-sm whitespace-nowrap"
                     >
-                        Wierszy na stronę
+                        {{ t('adminRowsPerPage') }}
                     </span>
                     <Select
                         :model-value="String(pageSize)"
                         @update:model-value="handlePageSizeChange"
                     >
                         <SelectTrigger
-                            class="border-border h-8 w-[4.5rem]"
+                            class="border-border h-8 w-18"
                             aria-labelledby="adminProductsPageSizeLabel"
                         >
                             <SelectValue placeholder="—" />
@@ -433,18 +481,23 @@ const selectedOnPageCount = computed(
                         class="text-muted-foreground text-sm tabular-nums"
                         aria-live="polite"
                     >
-                        Strona {{ page }} z {{ totalPages }}
+                        {{
+                            t('adminPageOf', {
+                                current: page,
+                                total: totalPages,
+                            })
+                        }}
                     </p>
                     <div
                         class="flex items-center gap-1"
                         role="navigation"
-                        aria-label="Paginacja tabeli produktów"
+                        :aria-label="t('adminPaginationProductsAria')"
                     >
                         <Button
                             variant="outline"
                             class="h-8 w-8 p-0"
                             :disabled="page <= 1 || isLoading"
-                            aria-label="Pierwsza strona"
+                            :aria-label="t('adminFirstPage')"
                             @click="handleFirstPage"
                             @keydown="
                                 handlePaginationButtonKeyDown(
@@ -459,7 +512,7 @@ const selectedOnPageCount = computed(
                             variant="outline"
                             class="h-8 w-8 p-0"
                             :disabled="page <= 1 || isLoading"
-                            aria-label="Poprzednia strona"
+                            :aria-label="t('adminPrevPage')"
                             @click="handlePrevPage"
                             @keydown="
                                 handlePaginationButtonKeyDown(
@@ -478,7 +531,7 @@ const selectedOnPageCount = computed(
                                 isLoading ||
                                 totalPages < 1
                             "
-                            aria-label="Następna strona"
+                            :aria-label="t('adminNextPage')"
                             @click="handleNextPage"
                             @keydown="
                                 handlePaginationButtonKeyDown(
@@ -497,7 +550,7 @@ const selectedOnPageCount = computed(
                                 isLoading ||
                                 totalPages < 1
                             "
-                            aria-label="Ostatnia strona"
+                            :aria-label="t('adminLastPage')"
                             @click="handleLastPage"
                             @keydown="
                                 handlePaginationButtonKeyDown(

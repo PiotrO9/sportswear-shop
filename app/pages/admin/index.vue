@@ -6,50 +6,40 @@ definePageMeta({
 });
 
 const localePath = useLocalePath();
+const { t } = useI18n();
 
 const quickActions = computed(() => [
     {
         to: localePath('/admin/products/new'),
-        label: 'Dodaj nowy produkt',
-        ariaLabel: 'Przejdź do formularza dodawania produktu',
+        label: t('adminQuickActionNewProduct'),
+        ariaLabel: t('adminQuickActionNewProductAria'),
     },
     {
         to: localePath('/admin/products'),
-        label: 'Przejdź do listy produktów',
-        ariaLabel: 'Przejdź do listy produktów',
+        label: t('adminQuickActionProductList'),
+        ariaLabel: t('adminQuickActionProductListAria'),
     },
     {
         to: localePath('/admin/inventory'),
-        label: 'Sprawdź niski stan magazynowy',
-        ariaLabel: 'Przejdź do listy niskich stanów magazynowych',
+        label: t('adminQuickActionLowStock'),
+        ariaLabel: t('adminQuickActionLowStockAria'),
     },
 ]);
 </script>
 
 <template>
     <AdminPanelShell
-        title="Panel administratora"
-        description="Szybki podgląd stanu katalogu i magazynu."
+        :title="t('adminDashboardTitle')"
+        :description="t('adminDashboardDescription')"
     >
         <div class="grid gap-4 md:grid-cols-3">
             <div
                 role="region"
-                aria-label="Liczba produktów"
-                class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
-            >
-                <p class="text-muted-foreground text-sm">Wszystkie produkty</p>
-                <p class="text-foreground mt-2 text-3xl font-bold tabular-nums">
-                    —
-                </p>
-            </div>
-
-            <div
-                role="region"
-                aria-label="Liczba niskich stanów magazynowych"
+                :aria-label="t('adminDashboardStatProductsAria')"
                 class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
             >
                 <p class="text-muted-foreground text-sm">
-                    Niskie stany wariantów
+                    {{ t('adminDashboardStatAllProducts') }}
                 </p>
                 <p class="text-foreground mt-2 text-3xl font-bold tabular-nums">
                     —
@@ -58,10 +48,25 @@ const quickActions = computed(() => [
 
             <div
                 role="region"
-                aria-label="Liczba produktów roboczych"
+                :aria-label="t('adminDashboardStatLowStockAria')"
                 class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
             >
-                <p class="text-muted-foreground text-sm">Produkty w draft</p>
+                <p class="text-muted-foreground text-sm">
+                    {{ t('adminDashboardStatLowStock') }}
+                </p>
+                <p class="text-foreground mt-2 text-3xl font-bold tabular-nums">
+                    —
+                </p>
+            </div>
+
+            <div
+                role="region"
+                :aria-label="t('adminDashboardStatDraftsAria')"
+                class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+            >
+                <p class="text-muted-foreground text-sm">
+                    {{ t('adminDashboardStatDrafts') }}
+                </p>
                 <p class="text-foreground mt-2 text-3xl font-bold tabular-nums">
                     —
                 </p>
@@ -70,10 +75,12 @@ const quickActions = computed(() => [
 
         <div
             role="region"
-            aria-label="Szybkie akcje panelu"
+            :aria-label="t('adminDashboardQuickActionsAria')"
             class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
         >
-            <p class="text-foreground mb-4 font-semibold">Szybkie akcje</p>
+            <p class="text-foreground mb-4 font-semibold">
+                {{ t('adminDashboardQuickActionsHeading') }}
+            </p>
 
             <div class="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
                 <Button

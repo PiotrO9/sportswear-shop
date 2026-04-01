@@ -47,11 +47,10 @@ const currentLocaleOption = computed(
         ) ?? localeOptions.value[0],
 );
 
-const buttonAriaLabel = computed(() => {
-    const { t } = useI18n();
-
-    return `${t('commonSwitchLanguage')}: ${currentLocaleOption.value?.name ?? activeLocaleCode.value}`;
-});
+const buttonAriaLabel = computed(
+    () =>
+        `${i18n.t('commonSwitchLanguage')}: ${currentLocaleOption.value?.name ?? activeLocaleCode.value}`,
+);
 
 function handleToggle() {
     isOpen.value = !isOpen.value;

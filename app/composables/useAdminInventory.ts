@@ -1,12 +1,15 @@
-export interface LowStockInventoryItem {
+export interface AdminInventoryRow {
     variantId: string;
     productId: string;
+    productName: string;
+    variantSize: string;
+    variantSku: string;
     quantity: number;
     lowStockThreshold: number;
 }
 
-export interface LowStockInventoryResponse {
-    items: LowStockInventoryItem[];
+export interface AdminInventoryListResponse {
+    items: AdminInventoryRow[];
     total: number;
 }
 
@@ -17,8 +20,8 @@ export interface UpdateInventoryPayload {
 }
 
 export function useAdminInventory() {
-    async function listLowStock(): Promise<LowStockInventoryResponse> {
-        return $fetch<LowStockInventoryResponse>('/api/admin/inventory', {
+    async function listInventory(): Promise<AdminInventoryListResponse> {
+        return $fetch<AdminInventoryListResponse>('/api/admin/inventory', {
             method: 'GET',
             credentials: 'include',
         });
@@ -39,7 +42,7 @@ export function useAdminInventory() {
     }
 
     return {
-        listLowStock,
+        listInventory,
         updateVariantInventory,
     };
 }

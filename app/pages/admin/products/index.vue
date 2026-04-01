@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { AdminProductListItem } from '~/types/admin-product';
+import Dialog from '@/components/ui/Dialog.vue';
 import { Button } from '@/components/shadcn/button';
 import {
     Select,
@@ -14,7 +15,14 @@ definePageMeta({
 });
 
 const localePath = useLocalePath();
-const { listProducts } = useAdminProducts();
+const { t } = useI18n();
+const { listProducts, updateProduct } = useAdminProducts();
+const { addToast } = useToast();
+
+const publishingProductId = ref<string | null>(null);
+
+const publishDialogOpen = ref(false);
+const publishDialogProduct = ref<{ id: string; name: string } | null>(null);
 
 const search = ref('');
 const statusFilter = ref<'all' | 'draft' | 'active' | 'archived'>('all');
@@ -28,12 +36,12 @@ const loadError = ref('');
 
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-const statusOptions = [
-    { value: 'all', label: 'Wszystkie statusy' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'active', label: 'Aktywne' },
-    { value: 'archived', label: 'Archiwalne' },
-] as const;
+const statusOptions = computed(() => [
+    { value: 'all' as const, label: t('adminStatusAll') },
+    { value: 'draft' as const, label: t('adminStatusDraft') },
+    { value: 'active' as const, label: t('adminStatusActive') },
+    { value: 'archived' as const, label: t('adminStatusArchived') },
+]);
 
 const totalPages = computed(() =>
     Math.max(1, Math.ceil(totalCount.value / pageSize.value)),
@@ -55,9 +63,9 @@ async function loadProducts(): Promise<void> {
         totalCount.value = response.total;
     } catch (error) {
         const message =
-            error instanceof Error ? error.message : 'Nieznany błąd';
+            error instanceof Error ? error.message : t('adminUnknownError');
 
-        loadError.value = `Nie udało się wczytać produktów: ${message}`;
+        loadError.value = t('adminProductsLoadError', { message });
         items.value = [];
         totalCount.value = 0;
     } finally {
@@ -113,6 +121,55 @@ function handleTablePageSizeChange(nextSize: number): void {
     loadProducts();
 }
 
+function handleOpenPublishConfirmDialog(productId: string): void {
+    if (publishingProductId.value !== null || publishDialogOpen.value) {
+        return;
+    }
+
+    const item = items.value.find((row) => row.id === productId);
+
+    publishDialogProduct.value = {
+        id: productId,
+        name: item?.name ?? '',
+    };
+    publishDialogOpen.value = true;
+}
+
+async function handlePublishDraftConfirm(): Promise<void> {
+    const ctx = publishDialogProduct.value;
+
+    if (!ctx) {
+        return;
+    }
+
+    if (publishingProductId.value !== null) {
+        return;
+    }
+
+    publishingProductId.value = ctx.id;
+
+    try {
+        await updateProduct(ctx.id, { status: 'active' });
+        await loadProducts();
+    } catch (error) {
+        const message =
+            error instanceof Error ? error.message : t('adminUnknownError');
+
+        addToast({
+            variant: 'error',
+            title: t('adminPublishFailedTitle'),
+            description: message,
+        });
+    } finally {
+        publishingProductId.value = null;
+        publishDialogProduct.value = null;
+    }
+}
+
+function handlePublishDraftDialogCancel(): void {
+    publishDialogProduct.value = null;
+}
+
 watch(search, () => {
     scheduleSearchReload();
 });
@@ -130,12 +187,46 @@ onUnmounted(() => {
 
 <template>
     <AdminPanelShell
-        title="Produkty"
-        description="Zarządzanie katalogiem produktów i stanem magazynowym (suma sztuk po wariantach)."
+        :title="t('adminProductsTitle')"
+        :description="t('adminProductsDescription')"
     >
+        <Dialog
+            v-model:open="publishDialogOpen"
+            :title="t('adminPublishDialogTitle')"
+            :cancel-text="t('adminCancel')"
+            :confirm-text="t('adminPublishConfirm')"
+            @confirm="handlePublishDraftConfirm"
+            @cancel="handlePublishDraftDialogCancel"
+        >
+            <template #default>
+                <div
+                    class="text-secondary-600 dark:text-secondary-400 space-y-3 text-sm"
+                >
+                    <p id="dialog-message">
+                        {{ t('adminPublishDialogPart1') }}
+                        <span
+                            class="text-secondary-900 dark:text-secondary-100 font-medium"
+                            >{{ t('adminStatusDraft') }}</span
+                        >
+                        {{ t('adminPublishDialogPart2') }}
+                        <span
+                            class="text-secondary-900 dark:text-secondary-100 font-medium"
+                            >{{ t('adminStatusActive') }}</span
+                        >
+                        {{ t('adminPublishDialogPart3') }}
+                    </p>
+                    <p
+                        class="text-secondary-900 dark:text-secondary-100 border-border border-t pt-2 text-xs font-medium"
+                    >
+                        {{ publishDialogProduct?.name || '—' }}
+                    </p>
+                </div>
+            </template>
+        </Dialog>
+
         <div
             role="region"
-            aria-label="Filtry produktów"
+            :aria-label="t('adminProductsFiltersAria')"
             class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
         >
             <div class="grid gap-3 md:grid-cols-[1fr_220px]">
@@ -145,7 +236,7 @@ onUnmounted(() => {
                         for="adminProductsSearch"
                         class="text-foreground text-sm font-medium"
                     >
-                        Szukaj po nazwie, SKU lub slug
+                        {{ t('adminProductsSearchLabel') }}
                     </label>
                     <input
                         id="adminProductsSearch"
@@ -153,7 +244,7 @@ onUnmounted(() => {
                         type="search"
                         class="border-input ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
                         aria-labelledby="adminProductsSearchLabel"
-                        placeholder="np. rashguard lub TSHIRT-M…"
+                        :placeholder="t('adminProductsSearchPlaceholder')"
                     />
                 </div>
 
@@ -163,7 +254,7 @@ onUnmounted(() => {
                         for="adminProductsStatusTrigger"
                         class="text-foreground text-sm font-medium"
                     >
-                        Status
+                        {{ t('adminStatusLabel') }}
                     </label>
                     <Select
                         :model-value="statusFilter"
@@ -174,7 +265,9 @@ onUnmounted(() => {
                             class="border-border w-full"
                             aria-labelledby="adminProductsStatusLabel"
                         >
-                            <SelectValue placeholder="Wybierz status" />
+                            <SelectValue
+                                :placeholder="t('adminSelectStatusPlaceholder')"
+                            />
                         </SelectTrigger>
                         <SelectContent class="border-border">
                             <SelectItem
@@ -194,7 +287,7 @@ onUnmounted(() => {
         <div
             v-if="loadError"
             role="alert"
-            aria-label="Błąd wczytywania listy produktów"
+            :aria-label="t('adminProductsLoadErrorAria')"
             class="border-destructive/30 bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
         >
             <p class="text-destructive text-sm">
@@ -205,10 +298,10 @@ onUnmounted(() => {
                 size="sm"
                 class="border-destructive/40 text-destructive mt-3"
                 type="button"
-                aria-label="Ponów wczytanie listy produktów"
+                :aria-label="t('adminRetryLoadProducts')"
                 @click="loadProducts"
             >
-                Spróbuj ponownie
+                {{ t('adminRetryLoadProducts') }}
             </Button>
         </div>
 
@@ -217,20 +310,26 @@ onUnmounted(() => {
                 class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
             >
                 <div>
-                    <p class="text-foreground font-semibold">Lista produktów</p>
+                    <p class="text-foreground font-semibold">
+                        {{ t('adminProductsListHeading') }}
+                    </p>
                     <p class="text-muted-foreground mt-1 text-xs">
                         <template v-if="!isLoading">
-                            {{ totalCount }} pozycji w bazie
+                            {{
+                                t('adminProductsCountInDb', {
+                                    count: totalCount,
+                                })
+                            }}
                         </template>
-                        <template v-else>Wczytywanie…</template>
+                        <template v-else>{{ t('adminLoading') }}</template>
                     </p>
                 </div>
                 <Button class="shrink-0" as-child>
                     <NuxtLink
                         :to="localePath('/admin/products/new')"
-                        aria-label="Przejdź do dodawania nowego produktu"
+                        :aria-label="t('adminAddProductAria')"
                     >
-                        Dodaj produkt
+                        {{ t('adminAddProduct') }}
                     </NuxtLink>
                 </Button>
             </div>
@@ -242,8 +341,10 @@ onUnmounted(() => {
                 :page-size="pageSize"
                 :total-count="totalCount"
                 :total-pages="totalPages"
+                :publishing-product-id="publishingProductId"
                 @update:page="handleTablePageChange"
                 @update:page-size="handleTablePageSizeChange"
+                @publish-draft="handleOpenPublishConfirmDialog"
             />
         </div>
     </AdminPanelShell>

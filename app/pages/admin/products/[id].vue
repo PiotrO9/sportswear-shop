@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import type { AdminProduct } from '~/types/admin-product';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/shadcn/select';
+import { normalizeStoredProductDescription } from '~/utils/product-description-html';
 
 definePageMeta({
     middleware: ['admin'],
 });
 
 const route = useRoute();
+const { t } = useI18n();
 const { addToast } = useToast();
 const { getProductById, updateProduct, uploadVariantImage } =
     useAdminProducts();
@@ -48,6 +57,20 @@ const variantsPreview = computed(() => {
     }));
 });
 
+const statusOptions = computed(() => [
+    { value: 'draft' as const, label: t('adminStatusDraft') },
+    { value: 'active' as const, label: t('adminStatusActive') },
+    { value: 'archived' as const, label: t('adminStatusArchived') },
+]);
+
+function handleProductStatusSelect(value: unknown): void {
+    if (typeof value !== 'string' || !value) {
+        return;
+    }
+
+    form.status = value as 'draft' | 'active' | 'archived';
+}
+
 async function handleLoadProduct(): Promise<void> {
     isLoading.value = true;
     loadError.value = '';
@@ -66,9 +89,9 @@ async function handleLoadProduct(): Promise<void> {
     } catch (error) {
         productDetail.value = null;
         const message =
-            error instanceof Error ? error.message : 'Nieznany błąd';
+            error instanceof Error ? error.message : t('adminUnknownError');
 
-        loadError.value = `Nie udało się załadować produktu: ${message}`;
+        loadError.value = t('adminErrorLoadProduct', { message });
     } finally {
         isLoading.value = false;
     }
@@ -87,23 +110,23 @@ async function handleSaveProduct(): Promise<void> {
             name: form.name,
             slug: form.slug,
             sku: form.sku,
-            description: form.description || null,
+            description: normalizeStoredProductDescription(form.description),
             price: form.price,
             status: form.status,
         });
 
         addToast({
-            title: 'Zapisano zmiany',
-            description: 'Dane podstawowe produktu zostały zaktualizowane.',
+            title: t('adminToastChangesSaved'),
+            description: t('adminToastChangesSavedDesc'),
             variant: 'success',
         });
     } catch (error) {
         const message =
-            error instanceof Error ? error.message : 'Nieznany błąd';
+            error instanceof Error ? error.message : t('adminUnknownError');
 
-        saveError.value = `Nie udało się zapisać produktu: ${message}`;
+        saveError.value = t('adminErrorSaveProduct', { message });
         addToast({
-            title: 'Błąd zapisu',
+            title: t('adminToastSaveError'),
             description: saveError.value,
             variant: 'error',
         });
@@ -129,18 +152,18 @@ async function handleVariantImageSelected(
         await uploadVariantImage(productId.value, variantId, file);
 
         addToast({
-            title: 'Dodano zdjęcie',
-            description: 'Plik został zapisany w Supabase Storage.',
+            title: t('adminToastImageAdded'),
+            description: t('adminToastImageAddedDesc'),
             variant: 'success',
         });
 
         await handleLoadProduct();
     } catch (error) {
         const message =
-            error instanceof Error ? error.message : 'Nieznany błąd';
+            error instanceof Error ? error.message : t('adminUnknownError');
 
         addToast({
-            title: 'Błąd wgrywania',
+            title: t('adminToastUploadError'),
             description: message,
             variant: 'error',
         });
@@ -169,10 +192,10 @@ onMounted(() => {
 
 <template>
     <AdminPanelShell
-        title="Edycja produktu"
-        description="Podstawowa edycja danych produktu i podgląd jego wariantów."
+        :title="t('adminEditProductTitle')"
+        :description="t('adminEditProductDescription')"
     >
-        <Card v-if="isLoading" aria-label="Ładowanie produktu">
+        <Card v-if="isLoading" :aria-label="t('adminLoadingProductAria')">
             <div class="space-y-2">
                 <div
                     class="bg-secondary-100 dark:bg-secondary-800 h-12 animate-pulse rounded-lg"
@@ -186,34 +209,37 @@ onMounted(() => {
             </div>
         </Card>
 
-        <Card v-else-if="loadError" aria-label="Błąd ładowania produktu">
+        <Card
+            v-else-if="loadError"
+            :aria-label="t('adminLoadProductErrorAria')"
+        >
             <p class="text-danger-600 dark:text-danger-300 text-sm">
                 {{ loadError }}
             </p>
             <template #footer>
                 <Action
-                    aria-label="Ponów pobranie danych produktu"
+                    :aria-label="t('adminRetryLoadProduct')"
                     variant="secondary"
                     @click="handleLoadProduct"
                 >
-                    Odśwież
+                    {{ t('adminRetryLoadProduct') }}
                 </Action>
             </template>
         </Card>
 
         <template v-else>
-            <Card aria-label="Dane podstawowe produktu">
+            <Card :aria-label="t('adminBasicDataCardAria')">
                 <div class="grid gap-4 md:grid-cols-2">
                     <div class="space-y-1 md:col-span-2">
                         <label
                             class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
                         >
-                            Nazwa
+                            {{ t('adminFormNameShort') }}
                         </label>
                         <Input
                             v-model="form.name"
-                            aria-label="Nazwa produktu"
-                            placeholder="Nazwa produktu"
+                            :aria-label="t('adminFormNameShort')"
+                            :placeholder="t('adminFormNamePlaceholderShort')"
                         />
                     </div>
 
@@ -221,12 +247,12 @@ onMounted(() => {
                         <label
                             class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
                         >
-                            Slug
+                            {{ t('adminFormSlug') }}
                         </label>
                         <Input
                             v-model="form.slug"
-                            aria-label="Slug produktu"
-                            placeholder="slug-produktu"
+                            :aria-label="t('adminFormSlug')"
+                            :placeholder="t('adminFormSlugPlaceholder')"
                         />
                     </div>
 
@@ -234,12 +260,12 @@ onMounted(() => {
                         <label
                             class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
                         >
-                            SKU
+                            {{ t('adminFormSkuShort') }}
                         </label>
                         <Input
                             v-model="form.sku"
-                            aria-label="SKU produktu"
-                            placeholder="SKU"
+                            :aria-label="t('adminFormSkuShort')"
+                            :placeholder="t('adminFormSkuPlaceholder')"
                         />
                     </div>
 
@@ -247,44 +273,64 @@ onMounted(() => {
                         <label
                             class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
                         >
-                            Cena (PLN)
+                            {{ t('adminFormPriceShort') }}
                         </label>
                         <Input
                             v-model="form.price"
                             type="number"
-                            aria-label="Cena produktu"
-                            placeholder="Cena"
+                            :aria-label="t('adminFormPriceShort')"
+                            :placeholder="t('adminFormPricePlaceholder')"
                         />
                     </div>
 
                     <div class="space-y-1">
                         <label
+                            id="adminEditProductStatusLabel"
                             class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
                         >
-                            Status
+                            {{ t('adminFormStatus') }}
                         </label>
-                        <select
-                            v-model="form.status"
-                            aria-label="Status produktu"
-                            class="border-secondary-300 dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-50 focus-visible:ring-primary-500 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none focus-visible:ring-2"
+                        <Select
+                            :model-value="form.status"
+                            :disabled="isSaving"
+                            aria-labelledby="adminEditProductStatusLabel"
+                            @update:model-value="handleProductStatusSelect"
                         >
-                            <option value="draft">Draft</option>
-                            <option value="active">Aktywny</option>
-                            <option value="archived">Archiwalny</option>
-                        </select>
+                            <SelectTrigger
+                                id="adminEditProductStatus"
+                                :aria-label="t('adminFormStatusAria')"
+                            >
+                                <SelectValue
+                                    :placeholder="
+                                        t('adminSelectStatusPlaceholder')
+                                    "
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem
+                                    v-for="option in statusOptions"
+                                    :key="option.value"
+                                    :value="option.value"
+                                >
+                                    {{ option.label }}
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div class="space-y-1 md:col-span-2">
                         <label
+                            for="adminEditProductDescription"
                             class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
                         >
-                            Opis
+                            {{ t('adminFormDescriptionShort') }}
                         </label>
-                        <textarea
+                        <AdminProductDescriptionEditor
                             v-model="form.description"
-                            rows="4"
-                            aria-label="Opis produktu"
-                            class="border-secondary-300 dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-50 focus-visible:ring-primary-500 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none focus-visible:ring-2"
+                            input-id="adminEditProductDescription"
+                            :aria-label="t('adminFormDescription')"
+                            :disabled="isSaving"
+                            :placeholder="t('adminFormDescriptionPlaceholder')"
                         />
                     </div>
                 </div>
@@ -292,12 +338,12 @@ onMounted(() => {
                 <template #footer>
                     <div class="flex flex-wrap gap-2">
                         <Action
-                            aria-label="Zapisz zmiany produktu"
+                            :aria-label="t('adminSaveChangesAria')"
                             :is-loading="isSaving"
                             :is-disabled="isSaving"
                             @click="handleSaveProduct"
                         >
-                            Zapisz zmiany
+                            {{ t('adminSaveChanges') }}
                         </Action>
                     </div>
                     <p
@@ -309,12 +355,12 @@ onMounted(() => {
                 </template>
             </Card>
 
-            <Card aria-label="Podgląd wariantów produktu">
+            <Card :aria-label="t('adminVariantsPreviewCardAria')">
                 <template #header>
                     <p
                         class="text-secondary-900 dark:text-secondary-50 font-semibold"
                     >
-                        Warianty produktu
+                        {{ t('adminVariantsProductTitle') }}
                     </p>
                 </template>
 
@@ -322,7 +368,7 @@ onMounted(() => {
                     v-if="variantsPreview.length === 0"
                     class="text-secondary-600 dark:text-secondary-300 text-sm"
                 >
-                    Ten produkt nie ma jeszcze wariantów.
+                    {{ t('adminNoVariantsYet') }}
                 </div>
 
                 <div v-else class="grid gap-4">
@@ -337,18 +383,30 @@ onMounted(() => {
                             <p
                                 class="text-secondary-900 dark:text-secondary-100 font-semibold"
                             >
-                                Rozmiar: {{ variant.size }}
+                                {{
+                                    t('adminVariantSizeLabel', {
+                                        size: variant.size,
+                                    })
+                                }}
                             </p>
                             <span
                                 class="text-secondary-500 dark:text-secondary-400 text-xs"
                             >
-                                SKU: {{ variant.sku }}
+                                {{
+                                    t('adminVariantSkuInline', {
+                                        sku: variant.sku,
+                                    })
+                                }}
                             </span>
                         </div>
                         <p
                             class="text-secondary-600 dark:text-secondary-300 mt-1 text-xs"
                         >
-                            Stan magazynowy: {{ variant.quantity }}
+                            {{
+                                t('adminVariantStockInline', {
+                                    quantity: variant.quantity,
+                                })
+                            }}
                         </p>
 
                         <div
@@ -364,7 +422,9 @@ onMounted(() => {
                                 class="border-secondary-200 dark:border-secondary-600 block overflow-hidden rounded-md border"
                                 :aria-label="
                                     image.alt ||
-                                    'Podgląd zdjęcia wariantu ' + variant.size
+                                    t('adminVariantImagePreviewAria', {
+                                        size: variant.size,
+                                    })
                                 "
                             >
                                 <img
@@ -379,7 +439,7 @@ onMounted(() => {
                             v-else
                             class="text-secondary-500 dark:text-secondary-400 mt-2 text-xs"
                         >
-                            Brak zdjęć dla tego wariantu.
+                            {{ t('adminVariantNoImages') }}
                         </p>
 
                         <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -389,8 +449,9 @@ onMounted(() => {
                                 accept="image/jpeg,image/png,image/webp"
                                 class="sr-only"
                                 :aria-label="
-                                    'Wgraj zdjęcie JPEG, PNG lub WebP dla wariantu ' +
-                                    variant.size
+                                    t('adminVariantUploadAria', {
+                                        size: variant.size,
+                                    })
                                 "
                                 :disabled="uploadingVariantId === variant.id"
                                 @change="
@@ -422,8 +483,8 @@ onMounted(() => {
                             >
                                 {{
                                     uploadingVariantId === variant.id
-                                        ? 'Wgrywanie…'
-                                        : 'Dodaj zdjęcie'
+                                        ? t('adminUploading')
+                                        : t('adminAddPhoto')
                                 }}
                             </button>
                         </div>
