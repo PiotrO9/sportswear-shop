@@ -7,7 +7,9 @@ import type {
     ProductSort,
 } from '~/types/product';
 
-const RASHGUARD_SHORT_SLEEVE_DESCRIPTION = `Ten model powstał z myślą o intensywnym treningu i pełnym skupieniu na celu. Sprawdzi się w BJJ, MMA, na siłowni, podczas crossfitu czy w terenie. To techniczna koszulka, która trenuje razem z Tobą – niezależnie od tempa i poziomu zaawansowania.
+const RASHGUARD_SHORT_SLEEVE_DESCRIPTION = `Męski rashguard z krótkim rękawem
+
+Ten model powstał z myślą o intensywnym treningu i pełnym skupieniu na celu. Sprawdzi się w BJJ, MMA, na siłowni, podczas crossfitu czy w terenie. To koszulka kompresyjna, która trenuje razem z Tobą – niezależnie od tempa i poziomu zaawansowania.
 
 Minimalistyczna grafika nadaje charakteru, ale to funkcjonalność gra tu pierwsze skrzypce. Dopasowany krój i elastyczny materiał tworzą efekt „drugiej skóry”, dzięki czemu możesz poruszać się swobodnie w każdej płaszczyźnie – bez ograniczeń i bez rozpraszania.
 
