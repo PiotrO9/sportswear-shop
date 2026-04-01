@@ -9,16 +9,15 @@ definePageMeta({
         title="Magazyn"
         description="Szybka edycja niskich stanów magazynowych dla wariantów."
     >
-        <Card aria-label="Niskie stany magazynowe">
-            <template #header>
-                <p
-                    class="text-secondary-900 dark:text-secondary-50 font-semibold"
-                >
-                    Warianty z niskim stanem
-                </p>
-            </template>
-
-            <p class="text-secondary-600 dark:text-secondary-300 text-sm">—</p>
-        </Card>
+        <div
+            role="region"
+            aria-label="Niskie stany magazynowe"
+            class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+        >
+            <p class="text-foreground mb-3 font-semibold">
+                Warianty z niskim stanem
+            </p>
+            <p class="text-muted-foreground text-sm">—</p>
+        </div>
     </AdminPanelShell>
 </template>

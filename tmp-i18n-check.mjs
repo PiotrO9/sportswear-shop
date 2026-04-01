@@ -39,12 +39,14 @@ function walk(directoryPath) {
         }
 
         const extension = path.extname(entry.name);
+
         if (!['.vue', '.ts', '.js'].includes(extension)) continue;
 
         const sourceCode = fs.readFileSync(fullPath, 'utf8');
 
         for (const regex of [keyInT, keyInDollarT]) {
             let match = regex.exec(sourceCode);
+
             while (match) {
                 usedKeys.add(match[1]);
                 match = regex.exec(sourceCode);
@@ -61,14 +63,18 @@ const usedMissingInPl = [...usedKeys].filter((key) => !plKeys.has(key)).sort();
 const usedMissingInEn = [...usedKeys].filter((key) => !enKeys.has(key)).sort();
 
 console.log(`MISSING_IN_EN ${missingInEn.length}`);
+
 for (const key of missingInEn) console.log(`  ${key}`);
 
 console.log(`MISSING_IN_PL ${missingInPl.length}`);
+
 for (const key of missingInPl) console.log(`  ${key}`);
 
 console.log(`USED_KEYS ${usedKeys.size}`);
 console.log(`USED_MISSING_IN_PL ${usedMissingInPl.length}`);
+
 for (const key of usedMissingInPl) console.log(`  ${key}`);
 
 console.log(`USED_MISSING_IN_EN ${usedMissingInEn.length}`);
+
 for (const key of usedMissingInEn) console.log(`  ${key}`);

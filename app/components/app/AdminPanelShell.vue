@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Button } from '@/components/shadcn/button';
+import { cn } from '@/lib/utils';
+
 interface AdminNavItem {
     to: string;
     label: string;
@@ -13,10 +16,14 @@ interface Props {
 const props = defineProps<Props>();
 const route = useRoute();
 const localePath = useLocalePath();
+const { t } = useI18n();
+const { handleLogout } = useLogout();
+
+const dashboardPath = computed(() => localePath('/admin'));
 
 const navItems = computed<AdminNavItem[]>(() => [
     {
-        to: localePath('/admin'),
+        to: dashboardPath.value,
         label: 'Dashboard',
         icon: 'heroicons:squares-2x2',
     },
@@ -37,60 +44,107 @@ const navItems = computed<AdminNavItem[]>(() => [
     },
 ]);
 
-function getLinkClass(path: string): string {
-    const currentPath = route.path.replace(/\/$/, '');
-    const targetPath = path.replace(/\/$/, '');
-    const isActive =
-        currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+function normalizePath(path: string): string {
+    return path.replace(/\/$/, '') || '/';
+}
 
-    if (isActive) {
-        return 'bg-primary-500 text-white dark:bg-primary-600';
+function isNavItemActive(path: string): boolean {
+    const currentPath = normalizePath(route.path);
+    const targetPath = normalizePath(path);
+    const adminHome = normalizePath(dashboardPath.value);
+
+    if (targetPath === adminHome) {
+        return currentPath === adminHome;
     }
 
-    return 'text-secondary-700 hover:bg-secondary-100 dark:text-secondary-200 dark:hover:bg-secondary-800';
+    return (
+        currentPath === targetPath || currentPath.startsWith(`${targetPath}/`)
+    );
+}
+
+function asidePanelClass(): string {
+    return cn(
+        'border-border bg-card text-card-foreground rounded-xl border p-3 shadow-sm',
+    );
+}
+
+function handleLogoutClick(): void {
+    handleLogout();
 }
 </script>
 
 <template>
     <section class="space-y-6">
-        <header class="space-y-2">
-            <h1
-                class="text-secondary-900 dark:text-secondary-50 text-2xl font-bold"
+        <header
+            class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
+        >
+            <div class="min-w-0 space-y-2">
+                <h1 class="text-foreground text-2xl font-bold tracking-tight">
+                    {{ props.title }}
+                </h1>
+                <p class="text-muted-foreground text-sm sm:text-base">
+                    {{ props.description }}
+                </p>
+            </div>
+            <Button
+                variant="outline"
+                size="sm"
+                class="border-border text-foreground shrink-0 self-start"
+                type="button"
+                :aria-label="t('navLogOut')"
+                @click="handleLogoutClick"
             >
-                {{ props.title }}
-            </h1>
-            <p class="text-secondary-600 dark:text-secondary-300">
-                {{ props.description }}
-            </p>
+                {{ t('navLogOut') }}
+            </Button>
         </header>
 
-        <div class="grid gap-4 lg:grid-cols-[260px_1fr]">
-            <aside>
-                <Card aria-label="Nawigacja panelu administratora">
+        <div class="grid gap-4 lg:grid-cols-[260px_1fr] lg:items-start">
+            <aside class="lg:sticky lg:top-4">
+                <div
+                    :class="asidePanelClass()"
+                    aria-label="Nawigacja panelu administratora"
+                >
+                    <p
+                        class="text-muted-foreground px-2 pb-2 text-xs font-medium tracking-wide uppercase"
+                    >
+                        Menu
+                    </p>
                     <nav
                         class="flex flex-col gap-1"
                         aria-label="Panel administratora"
                     >
-                        <NuxtLink
+                        <Button
                             v-for="item in navItems"
                             :key="item.to"
-                            :to="item.to"
-                            class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition"
-                            :class="getLinkClass(item.to)"
-                            :aria-label="`Przejdź do ${item.label}`"
+                            :variant="
+                                isNavItemActive(item.to) ? 'secondary' : 'ghost'
+                            "
+                            class="h-9 w-full justify-start gap-2 px-3"
+                            as-child
                         >
-                            <Icon
-                                :name="item.icon"
-                                class="size-4"
-                                aria-hidden="true"
-                            />
-                            <span>{{ item.label }}</span>
-                        </NuxtLink>
+                            <NuxtLink
+                                :to="item.to"
+                                class="inline-flex items-center"
+                                :aria-current="
+                                    isNavItemActive(item.to)
+                                        ? 'page'
+                                        : undefined
+                                "
+                                :aria-label="`Przejdź do ${item.label}`"
+                            >
+                                <Icon
+                                    :name="item.icon"
+                                    class="size-4 shrink-0"
+                                    aria-hidden="true"
+                                />
+                                <span>{{ item.label }}</span>
+                            </NuxtLink>
+                        </Button>
                     </nav>
-                </Card>
+                </div>
             </aside>
 
-            <div class="space-y-4">
+            <div class="min-w-0 space-y-4">
                 <slot />
             </div>
         </div>

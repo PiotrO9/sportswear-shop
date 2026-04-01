@@ -4,16 +4,16 @@ Ten dokument opisuje integrację [shadcn-vue](https://shadcn-vue.com/) z projekt
 
 ## Co zostało dodane
 
-| Obszar | Opis |
-|--------|------|
-| **Moduł Nuxt** | `shadcn-nuxt` — rejestruje komponenty z katalogu shadcn z prefiksem `Ui` (np. `UiButton`). |
-| **Komponenty UI** | Katalog [`app/components/shadcn/`](../app/components/shadcn/) — wygenerowane przez CLI m.in.: `table`, `checkbox`, `badge`, `button`, `dropdown-menu`, `select`. |
-| **Utils** | [`app/lib/utils.ts`](../app/lib/utils.ts) — `cn()`, `valueUpdater()` (dla TanStack Table). |
-| **Style** | Rozszerzenie [`app/assets/css/tailwind.css`](../app/assets/css/tailwind.css) o zmienne motywu shadcn (`:root`, `.dark`, `@theme inline`) oraz `@plugin 'tailwindcss-animate'` i import `tw-animate-css`. |
-| **Plugin** | [`app/plugins/ssr-width.ts`](../app/plugins/ssr-width.ts) — `provideSSRWidth` z VueUse, zmniejsza ryzyko błędów hydratacji dla komponentów zależnych od szerokości viewport. |
-| **Zależności** | m.in. `reka-ui`, `lucide-vue-next`, `class-variance-authority`, `tailwind-merge`, `tailwindcss-animate`, `tw-animate-css`, `@tanstack/vue-table`, `@vueuse/core`. |
-| **MCP** | [`.cursor/mcp.json`](../.cursor/mcp.json) — serwer MCP `shadcn-vue` dla Cursora. |
-| **Panel admin** | [`app/components/app/AdminProductsDataTable.vue`](../app/components/app/AdminProductsDataTable.vue) oraz pomocnicze komponenty wiersza; strona [`app/pages/admin/products/index.vue`](../app/pages/admin/products/index.vue). |
+| Obszar            | Opis                                                                                                                                                                                                                          |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Moduł Nuxt**    | `shadcn-nuxt` — rejestruje komponenty z katalogu shadcn z prefiksem `Ui` (np. `UiButton`).                                                                                                                                    |
+| **Komponenty UI** | Katalog [`app/components/shadcn/`](../app/components/shadcn/) — wygenerowane przez CLI m.in.: `table`, `checkbox`, `badge`, `button`, `dropdown-menu`, `select`.                                                              |
+| **Utils**         | [`app/lib/utils.ts`](../app/lib/utils.ts) — `cn()`, `valueUpdater()` (dla TanStack Table).                                                                                                                                    |
+| **Style**         | Rozszerzenie [`app/assets/css/tailwind.css`](../app/assets/css/tailwind.css) o zmienne motywu shadcn (`:root`, `.dark`, `@theme inline`) oraz `@plugin 'tailwindcss-animate'` i import `tw-animate-css`.                      |
+| **Plugin**        | [`app/plugins/ssr-width.ts`](../app/plugins/ssr-width.ts) — `provideSSRWidth` z VueUse, zmniejsza ryzyko błędów hydratacji dla komponentów zależnych od szerokości viewport.                                                  |
+| **Zależności**    | m.in. `reka-ui`, `lucide-vue-next`, `class-variance-authority`, `tailwind-merge`, `tailwindcss-animate`, `tw-animate-css`, `@tanstack/vue-table`, `@vueuse/core`.                                                             |
+| **MCP**           | [`.cursor/mcp.json`](../.cursor/mcp.json) — serwer MCP `shadcn-vue` dla Cursora.                                                                                                                                              |
+| **Panel admin**   | [`app/components/app/AdminProductsDataTable.vue`](../app/components/app/AdminProductsDataTable.vue) oraz pomocnicze komponenty wiersza; strona [`app/pages/admin/products/index.vue`](../app/pages/admin/products/index.vue). |
 
 ## Dlaczego osobny katalog `shadcn` i prefiks `Ui`
 
@@ -76,11 +76,11 @@ Paginacja **nie** jest obsługiwana przez wbudowany model stronicowania TanStack
 
 ### Powiązane komponenty aplikacji
 
-| Plik | Rola |
-|------|------|
-| `AdminProductsDataTable.vue` | Tabela, stopka z podsumowaniem zaznaczenia, selektor rozmiaru strony, nawigacja stron. |
-| `AdminProductsTableRowActions.vue` | Menu akcji wiersza (m.in. link „Edytuj”). |
-| `AdminProductsTableReviewerMenu.vue` | Placeholder menu „Przypisz” — pod przyszłe powiązanie z backendem. |
+| Plik                                 | Rola                                                                                   |
+| ------------------------------------ | -------------------------------------------------------------------------------------- |
+| `AdminProductsDataTable.vue`         | Tabela, stopka z podsumowaniem zaznaczenia, selektor rozmiaru strony, nawigacja stron. |
+| `AdminProductsTableRowActions.vue`   | Menu akcji wiersza (m.in. link „Edytuj”).                                              |
+| `AdminProductsTableReviewerMenu.vue` | Placeholder menu „Przypisz” — pod przyszłe powiązanie z backendem.                     |
 
 ### Dostępność
 
@@ -94,8 +94,8 @@ Przyciski paginacji i kontrolki mają etykiety `aria-label`; zaznaczanie wierszy
 
 ## Typowe problemy
 
-| Problem | Sugestia |
-|---------|----------|
+| Problem                                       | Sugestia                                                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Konflikt nazwy komponentu z `~/components/ui` | Zachować `prefix: 'Ui'` i `componentDir` na `shadcn`; nie mieszać starych i nowych komponentów o tej samej nazwie bez prefiksu. |
-| Błędy hydratacji przy `Select` / overlay | Sprawdzić, czy działa plugin `ssr-width.ts`; w razie potrzeby zaktualizować `reka-ui` / shadcn-vue. |
-| MCP nie odpowiada | Restart Cursora, włączenie serwera w ustawieniach; [troubleshooting](https://shadcn-vue.com/docs/mcp#troubleshooting). |
+| Błędy hydratacji przy `Select` / overlay      | Sprawdzić, czy działa plugin `ssr-width.ts`; w razie potrzeby zaktualizować `reka-ui` / shadcn-vue.                             |
+| MCP nie odpowiada                             | Restart Cursora, włączenie serwera w ustawieniach; [troubleshooting](https://shadcn-vue.com/docs/mcp#troubleshooting).          |

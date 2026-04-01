@@ -11,7 +11,6 @@ import {
     ChevronsLeft,
     ChevronsRight,
     CircleDashed,
-    GripVertical,
 } from 'lucide-vue-next';
 import { computed, h, ref, watch } from 'vue';
 import AdminProductsTableReviewerMenu from '~/components/app/AdminProductsTableReviewerMenu.vue';
@@ -115,11 +114,7 @@ const columns: ColumnDef<AdminProductListItem>[] = [
     {
         id: 'select',
         header: ({ table }) =>
-            h('div', { class: 'flex items-center gap-3 pl-1' }, [
-                h(GripVertical, {
-                    class: 'text-muted-foreground size-4 shrink-0 opacity-40',
-                    'aria-hidden': true,
-                }),
+            h('div', { class: 'flex items-center pl-1' }, [
                 h(Checkbox, {
                     ariaLabel: 'Zaznacz wszystkie wiersze na stronie',
                     modelValue:
@@ -130,11 +125,7 @@ const columns: ColumnDef<AdminProductListItem>[] = [
                 }),
             ]),
         cell: ({ row }) =>
-            h('div', { class: 'flex items-center gap-3' }, [
-                h(GripVertical, {
-                    class: 'text-muted-foreground size-4 shrink-0 cursor-grab opacity-50',
-                    'aria-hidden': true,
-                }),
+            h('div', { class: 'flex items-center' }, [
                 h(Checkbox, {
                     ariaLabel: `Zaznacz wiersz ${row.original.name}`,
                     modelValue: row.getIsSelected(),

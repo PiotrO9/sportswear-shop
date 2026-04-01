@@ -1,5 +1,6 @@
 import type {
     AdminProduct,
+    AdminProductSharedImageUploadResponse,
     AdminProductsListResponse,
     AdminProductsQuery,
     AdminVariantImageUploadResponse,
@@ -109,11 +110,47 @@ export function useAdminProducts() {
         );
     }
 
+    async function uploadProductSharedImageToVariants(
+        productId: string,
+        file: File,
+        options?: {
+            alt?: string | null;
+            isPrimary?: boolean;
+            variantIds?: string[];
+        },
+    ): Promise<AdminProductSharedImageUploadResponse> {
+        const formData = new FormData();
+
+        formData.append('file', file);
+
+        if (options?.alt != null && options.alt !== '') {
+            formData.append('alt', options.alt);
+        }
+
+        if (options?.isPrimary) {
+            formData.append('isPrimary', 'true');
+        }
+
+        if (options?.variantIds?.length) {
+            formData.append('variantIds', JSON.stringify(options.variantIds));
+        }
+
+        return $fetch<AdminProductSharedImageUploadResponse>(
+            `/api/admin/products/${productId}/images/shared`,
+            {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+            },
+        );
+    }
+
     return {
         listProducts,
         getProductById,
         createProduct,
         updateProduct,
         uploadVariantImage,
+        uploadProductSharedImageToVariants,
     };
 }

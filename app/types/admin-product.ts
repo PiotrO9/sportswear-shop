@@ -29,6 +29,11 @@ export interface AdminVariantImageUploadResponse {
     order: number;
 }
 
+export interface AdminProductSharedImageUploadResponse {
+    storagePath: string;
+    linked: Array<AdminVariantImageUploadResponse & { variantId: string }>;
+}
+
 export interface ProductVariant {
     id: string;
     productId: string;

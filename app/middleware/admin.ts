@@ -13,8 +13,6 @@ export default defineNuxtRouteMiddleware(async () => {
 
     const hasAdminAccess = await checkAdminAccess();
 
-    console.log(hasAdminAccess);
-
     if (hasAdminAccess) {
         return;
     }

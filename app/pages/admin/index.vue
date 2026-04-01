@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { Button } from '@/components/shadcn/button';
+
 definePageMeta({
     middleware: ['admin'],
 });
 
-const { t } = useI18n();
 const localePath = useLocalePath();
-const { handleLogout } = useLogout();
 
 const quickActions = computed(() => [
     {
@@ -24,10 +24,6 @@ const quickActions = computed(() => [
         ariaLabel: 'Przejdź do listy niskich stanów magazynowych',
     },
 ]);
-
-function handleLogoutClick(): void {
-    handleLogout();
-}
 </script>
 
 <template>
@@ -35,71 +31,67 @@ function handleLogoutClick(): void {
         title="Panel administratora"
         description="Szybki podgląd stanu katalogu i magazynu."
     >
-        <div class="flex flex-wrap items-center justify-end gap-2">
-            <Action
-                variant="secondary"
-                :aria-label="t('navLogOut')"
-                @click="handleLogoutClick"
-            >
-                {{ t('navLogOut') }}
-            </Action>
-        </div>
-
         <div class="grid gap-4 md:grid-cols-3">
-            <Card aria-label="Liczba produktów">
-                <p class="text-secondary-500 dark:text-secondary-400 text-sm">
-                    Wszystkie produkty
-                </p>
-                <p
-                    class="text-secondary-900 dark:text-secondary-50 mt-2 text-3xl font-bold"
-                >
+            <div
+                role="region"
+                aria-label="Liczba produktów"
+                class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+            >
+                <p class="text-muted-foreground text-sm">Wszystkie produkty</p>
+                <p class="text-foreground mt-2 text-3xl font-bold tabular-nums">
                     —
                 </p>
-            </Card>
+            </div>
 
-            <Card aria-label="Liczba niskich stanów magazynowych">
-                <p class="text-secondary-500 dark:text-secondary-400 text-sm">
+            <div
+                role="region"
+                aria-label="Liczba niskich stanów magazynowych"
+                class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+            >
+                <p class="text-muted-foreground text-sm">
                     Niskie stany wariantów
                 </p>
-                <p
-                    class="text-secondary-900 dark:text-secondary-50 mt-2 text-3xl font-bold"
-                >
+                <p class="text-foreground mt-2 text-3xl font-bold tabular-nums">
                     —
                 </p>
-            </Card>
+            </div>
 
-            <Card aria-label="Liczba produktów roboczych">
-                <p class="text-secondary-500 dark:text-secondary-400 text-sm">
-                    Produkty w draft
-                </p>
-                <p
-                    class="text-secondary-900 dark:text-secondary-50 mt-2 text-3xl font-bold"
-                >
+            <div
+                role="region"
+                aria-label="Liczba produktów roboczych"
+                class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+            >
+                <p class="text-muted-foreground text-sm">Produkty w draft</p>
+                <p class="text-foreground mt-2 text-3xl font-bold tabular-nums">
                     —
                 </p>
-            </Card>
+            </div>
         </div>
 
-        <Card aria-label="Szybkie akcje panelu">
-            <template #header>
-                <p
-                    class="text-secondary-900 dark:text-secondary-50 font-semibold"
-                >
-                    Szybkie akcje
-                </p>
-            </template>
+        <div
+            role="region"
+            aria-label="Szybkie akcje panelu"
+            class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+        >
+            <p class="text-foreground mb-4 font-semibold">Szybkie akcje</p>
 
             <div class="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-                <NuxtLink
+                <Button
                     v-for="action in quickActions"
                     :key="action.to"
-                    :to="action.to"
-                    class="border-secondary-200 dark:border-secondary-700 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-50 dark:hover:bg-secondary-800 rounded-xl border px-4 py-3 text-sm font-medium transition"
-                    :aria-label="action.ariaLabel"
+                    variant="outline"
+                    class="h-auto min-h-10 w-full justify-center py-2 text-center whitespace-normal"
+                    as-child
                 >
-                    {{ action.label }}
-                </NuxtLink>
+                    <NuxtLink
+                        :to="action.to"
+                        :aria-label="action.ariaLabel"
+                        class="inline-flex items-center justify-center"
+                    >
+                        {{ action.label }}
+                    </NuxtLink>
+                </Button>
             </div>
-        </Card>
+        </div>
     </AdminPanelShell>
 </template>

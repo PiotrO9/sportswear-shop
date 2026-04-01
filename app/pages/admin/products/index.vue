@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import type { AdminProductListItem } from '~/types/admin-product';
+import { Button } from '@/components/shadcn/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/shadcn/select';
 
 definePageMeta({
     middleware: ['admin'],
@@ -69,7 +77,19 @@ function scheduleSearchReload(): void {
     }, 350);
 }
 
-function handleStatusChange(): void {
+function handleStatusModelUpdate(value: unknown): void {
+    const next = String(value);
+
+    if (
+        next !== 'all' &&
+        next !== 'draft' &&
+        next !== 'active' &&
+        next !== 'archived'
+    ) {
+        return;
+    }
+
+    statusFilter.value = next;
     page.value = 1;
     loadProducts();
 }
@@ -113,92 +133,106 @@ onUnmounted(() => {
         title="Produkty"
         description="Zarządzanie katalogiem produktów i stanem magazynowym (suma sztuk po wariantach)."
     >
-        <Card aria-label="Filtry produktów">
+        <div
+            role="region"
+            aria-label="Filtry produktów"
+            class="border-border bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+        >
             <div class="grid gap-3 md:grid-cols-[1fr_220px]">
-                <div class="space-y-1">
+                <div class="space-y-2">
                     <label
+                        id="adminProductsSearchLabel"
                         for="adminProductsSearch"
-                        class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
+                        class="text-foreground text-sm font-medium"
                     >
                         Szukaj po nazwie, SKU lub slug
                     </label>
-                    <Input
+                    <input
                         id="adminProductsSearch"
                         v-model="search"
                         type="search"
-                        aria-label="Szukaj po nazwie, SKU lub slug"
+                        class="border-input ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none"
+                        aria-labelledby="adminProductsSearchLabel"
                         placeholder="np. rashguard lub TSHIRT-M…"
                     />
                 </div>
 
-                <div class="space-y-1">
+                <div class="space-y-2">
                     <label
-                        for="adminProductsStatus"
-                        class="text-secondary-600 dark:text-secondary-300 text-sm font-medium"
+                        id="adminProductsStatusLabel"
+                        for="adminProductsStatusTrigger"
+                        class="text-foreground text-sm font-medium"
                     >
                         Status
                     </label>
-                    <select
-                        id="adminProductsStatus"
-                        v-model="statusFilter"
-                        aria-label="Wybierz status produktów"
-                        class="border-secondary-300 dark:border-secondary-700 dark:bg-secondary-800 dark:text-secondary-50 focus-visible:ring-primary-500 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none focus-visible:ring-2"
-                        @change="handleStatusChange"
+                    <Select
+                        :model-value="statusFilter"
+                        @update:model-value="handleStatusModelUpdate"
                     >
-                        <option
-                            v-for="option in statusOptions"
-                            :key="option.value"
-                            :value="option.value"
+                        <SelectTrigger
+                            id="adminProductsStatusTrigger"
+                            class="border-border w-full"
+                            aria-labelledby="adminProductsStatusLabel"
                         >
-                            {{ option.label }}
-                        </option>
-                    </select>
+                            <SelectValue placeholder="Wybierz status" />
+                        </SelectTrigger>
+                        <SelectContent class="border-border">
+                            <SelectItem
+                                v-for="option in statusOptions"
+                                :key="option.value"
+                                :value="option.value"
+                                class="text-sm"
+                            >
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
-        </Card>
+        </div>
 
-        <Card v-if="loadError" aria-label="Błąd wczytywania listy produktów">
-            <p class="text-danger-600 dark:text-danger-300 text-sm">
+        <div
+            v-if="loadError"
+            role="alert"
+            aria-label="Błąd wczytywania listy produktów"
+            class="border-destructive/30 bg-card text-card-foreground rounded-xl border p-5 shadow-sm"
+        >
+            <p class="text-destructive text-sm">
                 {{ loadError }}
             </p>
-            <button
+            <Button
+                variant="outline"
+                size="sm"
+                class="border-destructive/40 text-destructive mt-3"
                 type="button"
-                class="text-primary-600 dark:text-primary-400 mt-3 text-sm font-semibold underline"
-                tabindex="0"
                 aria-label="Ponów wczytanie listy produktów"
                 @click="loadProducts"
-                @keydown.enter.prevent="loadProducts"
             >
                 Spróbuj ponownie
-            </button>
-        </Card>
+            </Button>
+        </div>
 
         <div class="space-y-3">
             <div
                 class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
             >
                 <div>
-                    <p
-                        class="text-secondary-900 dark:text-secondary-50 font-semibold"
-                    >
-                        Lista produktów
-                    </p>
-                    <p
-                        class="text-secondary-500 dark:text-secondary-400 mt-1 text-xs"
-                    >
+                    <p class="text-foreground font-semibold">Lista produktów</p>
+                    <p class="text-muted-foreground mt-1 text-xs">
                         <template v-if="!isLoading">
                             {{ totalCount }} pozycji w bazie
                         </template>
                         <template v-else>Wczytywanie…</template>
                     </p>
                 </div>
-                <NuxtLink
-                    :to="localePath('/admin/products/new')"
-                    class="bg-primary-500 hover:bg-primary-400 inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white transition"
-                    aria-label="Przejdź do dodawania nowego produktu"
-                >
-                    Dodaj produkt
-                </NuxtLink>
+                <Button class="shrink-0" as-child>
+                    <NuxtLink
+                        :to="localePath('/admin/products/new')"
+                        aria-label="Przejdź do dodawania nowego produktu"
+                    >
+                        Dodaj produkt
+                    </NuxtLink>
+                </Button>
             </div>
 
             <AdminProductsDataTable

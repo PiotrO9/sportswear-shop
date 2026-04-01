@@ -12,7 +12,7 @@ definePageMeta({
 
 const localePath = useLocalePath();
 const { addToast } = useToast();
-const { createProduct, getProductById, uploadVariantImage } =
+const { createProduct, uploadProductSharedImageToVariants } =
     useAdminProducts();
 
 const isSaving = ref(false);
@@ -183,39 +183,33 @@ async function handleSubmit(): Promise<void> {
             frontImageFile.value !== null || backImageFile.value !== null;
 
         if (hasProductPhotos) {
-            const product = await getProductById(created.id);
+            if (frontImageFile.value) {
+                await uploadProductSharedImageToVariants(
+                    created.id,
+                    frontImageFile.value,
+                    {
+                        alt: 'Przód produktu',
+                        isPrimary: true,
+                    },
+                );
+            }
 
-            for (const variant of product.variants) {
-                if (frontImageFile.value) {
-                    await uploadVariantImage(
-                        created.id,
-                        variant.id,
-                        frontImageFile.value,
-                        {
-                            alt: 'Przód produktu',
-                            isPrimary: true,
-                        },
-                    );
-                }
-
-                if (backImageFile.value) {
-                    await uploadVariantImage(
-                        created.id,
-                        variant.id,
-                        backImageFile.value,
-                        {
-                            alt: 'Tył produktu',
-                            isPrimary: false,
-                        },
-                    );
-                }
+            if (backImageFile.value) {
+                await uploadProductSharedImageToVariants(
+                    created.id,
+                    backImageFile.value,
+                    {
+                        alt: 'Tył produktu',
+                        isPrimary: false,
+                    },
+                );
             }
         }
 
         addToast({
             title: 'Produkt utworzony',
             description: hasProductPhotos
-                ? `Utworzono produkt, ${payload.variants.length} wariantów i wgrano zdjęcia do każdego wariantu.`
+                ? `Utworzono produkt, ${payload.variants.length} wariantów i wgrano wspólne zdjęcia (jedna kopia pliku w storage na zdjęcie).`
                 : `Utworzono produkt i ${payload.variants.length} wariantów.`,
             variant: 'success',
         });
@@ -425,10 +419,10 @@ onUnmounted(() => {
                 <p
                     class="text-secondary-600 dark:text-secondary-400 mt-1 text-xs font-normal"
                 >
-                    Te same pliki zostaną przypisane do każdego wygenerowanego
-                    wariantu (przód — zdjęcie główne, tył — drugie). Opcjonalne
-                    przy tworzeniu; później możesz dodać więcej zdjęć w edycji
-                    produktu.
+                    Jedna kopia każdego pliku trafia do storage; ta sama ścieżka
+                    jest powiązana z każdym wariantem (przód — zdjęcie główne,
+                    tył — drugie). Opcjonalne przy tworzeniu; później możesz
+                    dodać więcej zdjęć w edycji produktu.
                 </p>
             </template>
 
