@@ -3,7 +3,9 @@
 
 @theme {
     /* Impact globalnie: system (Windows/macOS); Anton z Google Fonts jako fallback (app.vue). */
-    --font-sans: 'Anton', Impact, Haettenschweiler, 'Franklin Gothic Bold', 'Arial Narrow Bold', 'Anton', ui-sans-serif, sans-serif;
+    --font-sans:
+        'Anton', Impact, Haettenschweiler, 'Franklin Gothic Bold',
+        'Arial Narrow Bold', 'Anton', ui-sans-serif, sans-serif;
 
     /*
      * Domyślne wartości Tailwinda dla tracking-tight/tighter są ujemne; klasy w warstwie utilities

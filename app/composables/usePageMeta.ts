@@ -13,6 +13,8 @@ export interface UsePageMetaOptions {
     description?: MaybeRefOrGetter<string>;
     /** Ścieżka do obrazka OG (np. /og-image.png) lub pełny URL */
     image?: string;
+    /** Gdy true — w zakładce tylko `title`, bez dopisku "| Frontend Starter" */
+    titleOnly?: boolean;
 }
 
 const DEFAULT_SITE_NAME = 'Frontend Starter';
@@ -25,13 +27,13 @@ export function usePageMeta(options: UsePageMetaOptions): void {
     const config = useRuntimeConfig();
     const siteUrl = config.public.siteUrl as string | undefined;
 
-    const { title, description, image } = options;
+    const { title, description, image, titleOnly = false } = options;
 
     const fullTitle = computed(() => {
         const titleVal = typeof title === 'function' ? title() : toValue(title);
-        return titleVal
-            ? `${titleVal} | ${DEFAULT_SITE_NAME}`
-            : DEFAULT_SITE_NAME;
+        if (!titleVal) return DEFAULT_SITE_NAME;
+        if (titleOnly) return titleVal;
+        return `${titleVal} | ${DEFAULT_SITE_NAME}`;
     });
 
     const descriptionVal = computed(() =>

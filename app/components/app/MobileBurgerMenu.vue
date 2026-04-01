@@ -183,18 +183,18 @@ onUnmounted(() => {
 
                 <Transition
                     enter-active-class="transition-transform duration-300 ease-out"
-                    enter-from-class="translate-x-full"
+                    enter-from-class="-translate-x-full"
                     enter-to-class="translate-x-0"
                     leave-active-class="transition-transform duration-200 ease-in"
                     leave-from-class="translate-x-0"
-                    leave-to-class="translate-x-full"
+                    leave-to-class="-translate-x-full"
                 >
                     <aside
                         v-if="open"
-                        class="dark:bg-secondary-900 absolute top-0 right-0 flex h-full w-[min(320px,85vw)] flex-col bg-white shadow-xl"
+                        class="dark:bg-secondary-900 absolute top-0 left-0 flex h-full w-[min(320px,85vw)] flex-col bg-white shadow-xl"
                     >
                         <div
-                            class="border-secondary-200 dark:border-secondary-700 flex items-center justify-end border-b px-4 py-4"
+                            class="border-secondary-200 dark:border-secondary-700 flex items-center justify-start border-b px-4 py-4"
                         >
                             <button
                                 type="button"

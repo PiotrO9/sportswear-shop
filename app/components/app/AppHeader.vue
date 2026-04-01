@@ -205,81 +205,108 @@ watch(
         @mouseleave="handleHeaderMouseLeave"
         @focusout="handleHeaderFocusOut"
     >
-        <div
-            class="relative z-60 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-8"
-        >
-            <div class="flex min-w-0 flex-1 items-center gap-4 lg:flex-initial">
-                <NuxtLink
-                    :to="localePath('/')"
-                    class="text-secondary-900 dark:text-secondary-50 hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-400 inline-flex shrink-0 items-center gap-2 rounded-lg text-xl font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                    :aria-label="t('navGoToHome')"
-                >
-                    <img
-                        src="/images/logo/logo.png"
-                        alt=""
-                        width="40"
-                        height="40"
-                        loading="eager"
-                        decoding="async"
-                        class="size-7 shrink-0 object-contain"
-                        aria-hidden="true"
-                    />
-                    Sportswear Shop
-                </NuxtLink>
-
-                <nav
-                    class="hidden items-center gap-1 lg:flex"
-                    :aria-label="t('navMainNavigation')"
-                >
-                    <NuxtLink
-                        :to="productsLink"
+        <div class="relative z-60 mx-auto w-full max-w-7xl px-6 py-4 lg:px-8">
+            <div class="flex items-center justify-between gap-3 lg:hidden">
+                <div class="flex min-w-0 flex-1 items-center gap-2">
+                    <button
+                        type="button"
+                        class="text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-secondary-50 focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 flex shrink-0 cursor-pointer items-center justify-center rounded-lg p-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        :aria-label="t('navOpenMenu')"
+                        :aria-expanded="isBurgerOpen"
                         tabindex="0"
-                        class="focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                        :class="productsButtonClass()"
-                        :aria-label="t('navProducts')"
-                        aria-haspopup="true"
-                        :aria-expanded="isProductsMenuOpen"
-                        aria-controls="products-mega-menu"
-                        @mouseenter="handleProductsTriggerHover"
-                        @keydown="handleProductsMenuButtonKeyDown"
-                        @focus="handleOpenProductsMenu"
+                        @click="handleToggleBurger"
+                        @keydown="handleBurgerKeyDown"
                     >
-                        {{ t('navProducts') }}
-                    </NuxtLink>
+                        <Icon
+                            name="heroicons:bars-3"
+                            class="size-6"
+                            size="24"
+                            aria-hidden="true"
+                        />
+                    </button>
 
                     <NuxtLink
-                        v-for="link in navLinks"
-                        :key="link.to"
-                        :to="link.to"
-                        class="focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-                        :class="linkClass(link.to)"
-                        :aria-label="link.ariaLabel"
-                        @mouseenter="handleNavLinkHover"
+                        :to="localePath('/')"
+                        class="text-secondary-900 dark:text-secondary-50 hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 inline-flex shrink-0 items-center rounded-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        :aria-label="t('navGoToHome')"
                     >
-                        {{ link.label }}
+                        <img
+                            src="/images/logo/logo.png"
+                            alt=""
+                            width="40"
+                            height="40"
+                            loading="eager"
+                            decoding="async"
+                            class="size-9 shrink-0 object-contain"
+                            aria-hidden="true"
+                        />
                     </NuxtLink>
-                </nav>
+                </div>
+
+                <div class="flex shrink-0 items-center">
+                    <LanguageSwitcher />
+                </div>
             </div>
 
-            <div class="flex shrink-0 items-center gap-2 sm:gap-4">
-                <LanguageSwitcher />
-
-                <button
-                    type="button"
-                    class="text-secondary-700 hover:text-secondary-900 dark:text-secondary-300 dark:hover:text-secondary-50 focus-visible:ring-primary-400 flex cursor-pointer items-center justify-center rounded-lg p-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:hidden"
-                    :aria-label="t('navOpenMenu')"
-                    :aria-expanded="isBurgerOpen"
-                    tabindex="0"
-                    @click="handleToggleBurger"
-                    @keydown="handleBurgerKeyDown"
+            <div class="hidden items-center justify-between gap-4 lg:flex">
+                <div
+                    class="flex min-w-0 flex-1 items-center gap-4 lg:flex-initial"
                 >
-                    <Icon
-                        name="heroicons:bars-3"
-                        class="size-6"
-                        size="24"
-                        aria-hidden="true"
-                    />
-                </button>
+                    <NuxtLink
+                        :to="localePath('/')"
+                        class="text-secondary-900 dark:text-secondary-50 hover:text-primary-600 dark:hover:text-primary-400 focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 inline-flex shrink-0 items-center gap-2 rounded-lg text-xl font-bold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                        :aria-label="t('navGoToHome')"
+                    >
+                        <img
+                            src="/images/logo/logo.png"
+                            alt=""
+                            width="40"
+                            height="40"
+                            loading="eager"
+                            decoding="async"
+                            class="size-7 shrink-0 object-contain"
+                            aria-hidden="true"
+                        />
+                        Sportswear Shop
+                    </NuxtLink>
+
+                    <nav
+                        class="flex items-center gap-1"
+                        :aria-label="t('navMainNavigation')"
+                    >
+                        <NuxtLink
+                            :to="productsLink"
+                            tabindex="0"
+                            class="focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                            :class="productsButtonClass()"
+                            :aria-label="t('navProducts')"
+                            aria-haspopup="true"
+                            :aria-expanded="isProductsMenuOpen"
+                            aria-controls="products-mega-menu"
+                            @mouseenter="handleProductsTriggerHover"
+                            @keydown="handleProductsMenuButtonKeyDown"
+                            @focus="handleOpenProductsMenu"
+                        >
+                            {{ t('navProducts') }}
+                        </NuxtLink>
+
+                        <NuxtLink
+                            v-for="link in navLinks"
+                            :key="link.to"
+                            :to="link.to"
+                            class="focus-visible:ring-primary-400 dark:focus-visible:ring-offset-secondary-950 rounded-lg px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                            :class="linkClass(link.to)"
+                            :aria-label="link.ariaLabel"
+                            @mouseenter="handleNavLinkHover"
+                        >
+                            {{ link.label }}
+                        </NuxtLink>
+                    </nav>
+                </div>
+
+                <div class="flex shrink-0 items-center gap-2 sm:gap-4">
+                    <LanguageSwitcher />
+                </div>
             </div>
         </div>
 
