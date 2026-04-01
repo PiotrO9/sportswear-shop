@@ -2,6 +2,7 @@ import type {
     AdminProduct,
     AdminProductsListResponse,
     AdminProductsQuery,
+    AdminVariantImageUploadResponse,
     CreateAdminProductInput,
     UpdateAdminProductInput,
 } from '~/types/admin-product';
@@ -80,10 +81,39 @@ export function useAdminProducts() {
         });
     }
 
+    async function uploadVariantImage(
+        productId: string,
+        variantId: string,
+        file: File,
+        options?: { alt?: string | null; isPrimary?: boolean },
+    ): Promise<AdminVariantImageUploadResponse> {
+        const formData = new FormData();
+
+        formData.append('file', file);
+
+        if (options?.alt != null && options.alt !== '') {
+            formData.append('alt', options.alt);
+        }
+
+        if (options?.isPrimary) {
+            formData.append('isPrimary', 'true');
+        }
+
+        return $fetch<AdminVariantImageUploadResponse>(
+            `/api/admin/products/${productId}/variants/${variantId}/images`,
+            {
+                method: 'POST',
+                credentials: 'include',
+                body: formData,
+            },
+        );
+    }
+
     return {
         listProducts,
         getProductById,
         createProduct,
         updateProduct,
+        uploadVariantImage,
     };
 }

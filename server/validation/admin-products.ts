@@ -3,14 +3,6 @@ import { z } from 'zod';
 const productCategorySchema = z.enum(['men', 'women', 'kids', 'sport']);
 const productMaterialSchema = z.enum(['cotton', 'polyester', 'blend', 'lycra']);
 const productSizeSchema = z.enum(['XS', 'S', 'M', 'L', 'XL', 'XXL']);
-const productColorSchema = z.enum([
-    'black',
-    'white',
-    'grey',
-    'navy',
-    'red',
-    'blue',
-]);
 const adminProductStatusSchema = z.enum(['draft', 'active', 'archived']);
 
 export const listAdminProductsQuerySchema = z.object({
@@ -27,6 +19,11 @@ export const listAdminProductsQuerySchema = z.object({
 
 export const productIdParamsSchema = z.object({
     id: z.string().uuid(),
+});
+
+export const productVariantImageParamsSchema = z.object({
+    id: z.string().uuid(),
+    variantId: z.string().uuid(),
 });
 
 export const createAdminProductSchema = z.object({
@@ -46,13 +43,11 @@ export const createAdminProductSchema = z.object({
     status: adminProductStatusSchema.default('draft'),
     options: z.object({
         sizes: z.array(productSizeSchema).min(1),
-        colors: z.array(productColorSchema).min(1),
     }),
     variants: z
         .array(
             z.object({
                 size: productSizeSchema,
-                color: productColorSchema,
                 sku: z.string().trim().min(1).max(120),
                 priceOverride: z.number().nonnegative().nullable().optional(),
                 isActive: z.boolean().optional(),

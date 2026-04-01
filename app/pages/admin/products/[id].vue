@@ -1,16 +1,20 @@
 <script setup lang="ts">
+import type { AdminProduct } from '~/types/admin-product';
+
 definePageMeta({
     middleware: ['admin'],
 });
 
 const route = useRoute();
 const { addToast } = useToast();
-const { getProductById, updateProduct } = useAdminProducts();
+const { getProductById, updateProduct, uploadVariantImage } =
+    useAdminProducts();
 
 const isLoading = ref(true);
 const isSaving = ref(false);
 const loadError = ref('');
 const saveError = ref('');
+const uploadingVariantId = ref<string | null>(null);
 
 const productId = computed(() => String(route.params.id));
 
@@ -23,16 +27,26 @@ const form = reactive({
     status: 'draft' as 'draft' | 'active' | 'archived',
 });
 
-const variantsPreview = ref<
-    Array<{
-        id: string;
-        size: string;
-        color: string;
-        sku: string;
-        imagesCount: number;
-        quantity: number;
-    }>
->([]);
+const productDetail = ref<AdminProduct | null>(null);
+
+const variantsPreview = computed(() => {
+    const product = productDetail.value;
+
+    if (!product) {
+        return [];
+    }
+
+    return product.variants.map((variant) => ({
+        id: variant.id,
+        size: variant.size,
+        sku: variant.sku,
+        images: variant.images,
+        quantity:
+            product.inventory.find(
+                (inventoryItem) => inventoryItem.variantId === variant.id,
+            )?.quantity ?? 0,
+    }));
+});
 
 async function handleLoadProduct(): Promise<void> {
     isLoading.value = true;
@@ -48,18 +62,9 @@ async function handleLoadProduct(): Promise<void> {
         form.price = product.price;
         form.status = product.status;
 
-        variantsPreview.value = product.variants.map((variant) => ({
-            id: variant.id,
-            size: variant.size,
-            color: variant.color,
-            sku: variant.sku,
-            imagesCount: variant.images.length,
-            quantity:
-                product.inventory.find(
-                    (inventoryItem) => inventoryItem.variantId === variant.id,
-                )?.quantity ?? 0,
-        }));
+        productDetail.value = product;
     } catch (error) {
+        productDetail.value = null;
         const message =
             error instanceof Error ? error.message : 'Nieznany błąd';
 
@@ -105,6 +110,56 @@ async function handleSaveProduct(): Promise<void> {
     } finally {
         isSaving.value = false;
     }
+}
+
+async function handleVariantImageSelected(
+    variantId: string,
+    event: Event,
+): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file || uploadingVariantId.value) {
+        return;
+    }
+
+    uploadingVariantId.value = variantId;
+
+    try {
+        await uploadVariantImage(productId.value, variantId, file);
+
+        addToast({
+            title: 'Dodano zdjęcie',
+            description: 'Plik został zapisany w Supabase Storage.',
+            variant: 'success',
+        });
+
+        await handleLoadProduct();
+    } catch (error) {
+        const message =
+            error instanceof Error ? error.message : 'Nieznany błąd';
+
+        addToast({
+            title: 'Błąd wgrywania',
+            description: message,
+            variant: 'error',
+        });
+    } finally {
+        uploadingVariantId.value = null;
+        input.value = '';
+    }
+}
+
+function handleVariantUploadButtonKeyDown(
+    variantId: string,
+    event: KeyboardEvent,
+): void {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+    }
+
+    event.preventDefault();
+    document.getElementById(`variant-image-file-${variantId}`)?.click();
 }
 
 onMounted(() => {
@@ -270,11 +325,11 @@ onMounted(() => {
                     Ten produkt nie ma jeszcze wariantów.
                 </div>
 
-                <div v-else class="grid gap-2">
+                <div v-else class="grid gap-4">
                     <div
                         v-for="variant in variantsPreview"
                         :key="variant.id"
-                        class="border-secondary-200 dark:border-secondary-700 rounded-lg border px-3 py-2 text-sm"
+                        class="border-secondary-200 dark:border-secondary-700 rounded-lg border px-3 py-3 text-sm"
                     >
                         <div
                             class="flex flex-wrap items-center justify-between gap-2"
@@ -282,7 +337,7 @@ onMounted(() => {
                             <p
                                 class="text-secondary-900 dark:text-secondary-100 font-semibold"
                             >
-                                {{ variant.size }} / {{ variant.color }}
+                                Rozmiar: {{ variant.size }}
                             </p>
                             <span
                                 class="text-secondary-500 dark:text-secondary-400 text-xs"
@@ -293,10 +348,85 @@ onMounted(() => {
                         <p
                             class="text-secondary-600 dark:text-secondary-300 mt-1 text-xs"
                         >
-                            Zdjęcia: {{ variant.imagesCount }} | Stan
-                            magazynowy:
-                            {{ variant.quantity }}
+                            Stan magazynowy: {{ variant.quantity }}
                         </p>
+
+                        <div
+                            v-if="variant.images.length > 0"
+                            class="mt-3 flex flex-wrap gap-2"
+                        >
+                            <a
+                                v-for="image in variant.images"
+                                :key="image.id"
+                                :href="image.url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="border-secondary-200 dark:border-secondary-600 block overflow-hidden rounded-md border"
+                                :aria-label="
+                                    image.alt ||
+                                    'Podgląd zdjęcia wariantu ' + variant.size
+                                "
+                            >
+                                <img
+                                    :src="image.url"
+                                    :alt="image.alt || ''"
+                                    class="h-20 w-20 object-cover"
+                                    loading="lazy"
+                                />
+                            </a>
+                        </div>
+                        <p
+                            v-else
+                            class="text-secondary-500 dark:text-secondary-400 mt-2 text-xs"
+                        >
+                            Brak zdjęć dla tego wariantu.
+                        </p>
+
+                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                            <input
+                                :id="'variant-image-file-' + variant.id"
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                class="sr-only"
+                                :aria-label="
+                                    'Wgraj zdjęcie JPEG, PNG lub WebP dla wariantu ' +
+                                    variant.size
+                                "
+                                :disabled="uploadingVariantId === variant.id"
+                                @change="
+                                    handleVariantImageSelected(
+                                        variant.id,
+                                        $event,
+                                    )
+                                "
+                            />
+                            <button
+                                type="button"
+                                tabindex="0"
+                                class="border-secondary-300 dark:border-secondary-600 text-secondary-800 dark:text-secondary-100 hover:bg-secondary-100 dark:hover:bg-secondary-800 focus-visible:ring-primary-500 dark:bg-secondary-900 inline-flex items-center rounded-md border bg-white px-3 py-1.5 text-xs font-medium outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                :disabled="uploadingVariantId === variant.id"
+                                :aria-busy="uploadingVariantId === variant.id"
+                                @click="
+                                    document
+                                        .getElementById(
+                                            'variant-image-file-' + variant.id,
+                                        )
+                                        ?.click()
+                                "
+                                @keydown="
+                                    handleVariantUploadButtonKeyDown(
+                                        variant.id,
+                                        $event,
+                                    )
+                                "
+                            >
+                                {{
+                                    uploadingVariantId === variant.id
+                                        ? 'Wgrywanie…'
+                                        : 'Dodaj zdjęcie'
+                                }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </Card>

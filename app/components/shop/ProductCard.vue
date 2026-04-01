@@ -6,10 +6,7 @@ interface Props {
 }
 
 interface Emits {
-    (
-        e: 'add-to-cart',
-        payload: { product: Product; size: string; color: string },
-    ): void;
+    (e: 'add-to-cart', payload: { product: Product; size: string }): void;
 }
 
 const props = defineProps<Props>();
@@ -132,11 +129,7 @@ function formatPrice(price: number): string {
     }).format(price);
 }
 
-function handleAddToCart(payload: {
-    product: Product;
-    size: string;
-    color: string;
-}) {
+function handleAddToCart(payload: { product: Product; size: string }) {
     emit('add-to-cart', payload);
 }
 </script>

@@ -1,4 +1,5 @@
 import { serverSupabaseClient } from '#supabase/server';
+import { resolveVariantImagePublicUrl } from '../utils/variant-image-storage';
 import type {
     AdminProduct,
     AdminProductListItem,
@@ -26,7 +27,6 @@ interface ProductVariantRow {
     id: string;
     product_id: string;
     size: string;
-    color: string;
     sku: string;
     price_override: number | null;
     is_active: boolean;
@@ -82,7 +82,11 @@ export async function listAdminProductsRepository(
         .order('updated_at', { ascending: false });
 
     if (query.search) {
-        builder = builder.ilike('name', `%${query.search}%`);
+        const term = `%${query.search.trim()}%`;
+
+        builder = builder.or(
+            `name.ilike.${term},sku.ilike.${term},slug.ilike.${term}`,
+        );
     }
 
     if (query.category && query.category !== 'all') {
@@ -234,7 +238,7 @@ export async function getAdminProductByIdRepository(
     const { data: variantsRows, error: variantsError } = await client
         .from('product_variants')
         .select(
-            'id,product_id,size,color,sku,price_override,is_active,inventory_items(variant_id,quantity,low_stock_threshold),variant_images(id,variant_id,path,alt,is_primary,order_index,created_at)',
+            'id,product_id,size,sku,price_override,is_active,inventory_items(variant_id,quantity,low_stock_threshold),variant_images(id,variant_id,path,alt,is_primary,order_index,created_at)',
         )
         .eq('product_id', productId)
         .order('created_at', { ascending: true })
@@ -252,7 +256,6 @@ export async function getAdminProductByIdRepository(
         id: variant.id,
         productId: variant.product_id,
         size: variant.size,
-        color: variant.color,
         sku: variant.sku,
         priceOverride: variant.price_override,
         isActive: variant.is_active,
@@ -261,7 +264,7 @@ export async function getAdminProductByIdRepository(
             .map((image) => ({
                 id: image.id,
                 variantId: image.variant_id,
-                url: image.path,
+                url: resolveVariantImagePublicUrl(event, client, image.path),
                 alt: image.alt,
                 isPrimary: image.is_primary,
                 order: image.order_index,
@@ -271,7 +274,6 @@ export async function getAdminProductByIdRepository(
 
     const options = {
         sizes: [...new Set(variants.map((variant) => variant.size))],
-        colors: [...new Set(variants.map((variant) => variant.color))],
     };
 
     const inventory = (variantsRows ?? []).map((variant) => {
@@ -324,7 +326,6 @@ export async function createAdminProductRepository(
     const variantRows = input.variants.map((variant) => ({
         product_id: productData.id,
         size: variant.size,
-        color: variant.color,
         sku: variant.sku,
         price_override: variant.priceOverride ?? null,
         is_active: variant.isActive ?? true,

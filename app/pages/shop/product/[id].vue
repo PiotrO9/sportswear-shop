@@ -114,11 +114,7 @@ usePageMeta({
         product.value ? buildProductMetaDescription(product.value) : '',
 });
 
-function handleAddToCart(payload: {
-    product: { name: string };
-    size: string;
-    color: string;
-}) {
+function handleAddToCart(payload: { product: { name: string }; size: string }) {
     addToast({
         title: t('productCardAddedToCart'),
         description: t('productCardAddedToCartDesc', {

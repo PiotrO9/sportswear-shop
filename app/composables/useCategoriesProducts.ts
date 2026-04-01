@@ -1,7 +1,6 @@
 import type {
     Product,
     ProductCategory,
-    ProductColor,
     ProductMaterial,
     ProductSize,
     ProductSort,
@@ -80,7 +79,6 @@ function rashguardShortSleeveMockProduct(
         subcategory: 'rashguard-short-sleeve',
         sizes: ['S', 'M', 'L', 'XL'],
         material: 'lycra',
-        colors: ['black', 'white', 'navy'],
         images: [
             `${basePath}/${prefix}-front.webp`,
             `${basePath}/${prefix}-back.webp`,
@@ -101,7 +99,6 @@ export function useCategoriesProducts() {
         maxPrice: number,
         size: ProductSize | null,
         material: ProductMaterial | 'all',
-        color: ProductColor | 'all',
         sort: ProductSort,
         subcategory: string | null = null,
     ): Product[] {
@@ -127,10 +124,6 @@ export function useCategoriesProducts() {
             }
 
             if (material !== 'all' && product.material !== material) {
-                return false;
-            }
-
-            if (color !== 'all' && !product.colors.includes(color)) {
                 return false;
             }
 

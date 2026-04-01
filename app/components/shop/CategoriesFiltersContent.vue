@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type {
     ProductCategory,
-    ProductColor,
     ProductMaterial,
     ProductSize,
     ProductSort,
@@ -13,7 +12,6 @@ interface Props {
     filterMaxPrice: string;
     filterSize: ProductSize | null;
     filterMaterial: ProductMaterial | 'all';
-    filterColor: ProductColor | 'all';
     filterSort: ProductSort;
     idPrefix?: string;
     compact?: boolean;
@@ -31,7 +29,6 @@ const emit = defineEmits<{
     'update:filterMaxPrice': [value: string];
     'update:filterSize': [value: ProductSize | null];
     'update:filterMaterial': [value: ProductMaterial | 'all'];
-    'update:filterColor': [value: ProductColor | 'all'];
     'update:filterSort': [value: ProductSort];
     reset: [];
 }>();
@@ -60,16 +57,6 @@ const materialOptions: { value: ProductMaterial | 'all'; labelKey: string }[] =
         { value: 'blend', labelKey: 'creatorOptionBlend' },
         { value: 'lycra', labelKey: 'creatorOptionLycra' },
     ];
-
-const colorOptions: { value: ProductColor | 'all'; labelKey: string }[] = [
-    { value: 'all', labelKey: 'categoriesFilterColorAll' },
-    { value: 'black', labelKey: 'creatorOptionBlack' },
-    { value: 'white', labelKey: 'creatorOptionWhite' },
-    { value: 'grey', labelKey: 'creatorOptionGrey' },
-    { value: 'navy', labelKey: 'creatorOptionNavy' },
-    { value: 'red', labelKey: 'creatorOptionRed' },
-    { value: 'blue', labelKey: 'creatorOptionBlue' },
-];
 
 const sortOptions: { value: ProductSort; labelKey: string }[] = [
     { value: 'price-asc', labelKey: 'categoriesFilterSortPriceAsc' },
@@ -110,12 +97,6 @@ function handleMaterialChange(event: Event) {
     emit('update:filterMaterial', target.value as ProductMaterial | 'all');
 }
 
-function handleColorChange(event: Event) {
-    const target = event.target as HTMLSelectElement;
-
-    emit('update:filterColor', target.value as ProductColor | 'all');
-}
-
 function handleSortChange(event: Event) {
     const target = event.target as HTMLSelectElement;
 
@@ -136,10 +117,6 @@ function handleMaxPriceUpdate(value: string | number) {
 
 function handleMaterialUpdate(value: string | number) {
     emit('update:filterMaterial', value as ProductMaterial | 'all');
-}
-
-function handleColorUpdate(value: string | number) {
-    emit('update:filterColor', value as ProductColor | 'all');
 }
 
 function handleSortUpdate(value: string | number) {
@@ -307,47 +284,6 @@ function handleSortUpdate(value: string | number) {
             >
                 <Radio
                     v-for="opt in materialOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                    :aria-label="t(opt.labelKey)"
-                >
-                    {{ t(opt.labelKey) }}
-                </Radio>
-            </RadioGroup>
-        </div>
-
-        <div :class="compact ? 'space-y-1' : 'space-y-2'">
-            <label
-                class="block text-base font-medium text-slate-700 dark:text-slate-300"
-                :for="`${idPrefix}-color`"
-            >
-                {{ t('categoriesFilterColor') }}
-            </label>
-            <select
-                v-if="compact"
-                :id="`${idPrefix}-color`"
-                :value="filterColor"
-                :class="selectClass"
-                :aria-label="t('categoriesFilterColor')"
-                @change="handleColorChange"
-            >
-                <option
-                    v-for="opt in colorOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                >
-                    {{ t(opt.labelKey) }}
-                </option>
-            </select>
-            <RadioGroup
-                v-else
-                :model-value="filterColor"
-                :aria-label="t('categoriesFilterColor')"
-                orientation="vertical"
-                @update:model-value="handleColorUpdate($event)"
-            >
-                <Radio
-                    v-for="opt in colorOptions"
                     :key="opt.value"
                     :value="opt.value"
                     :aria-label="t(opt.labelKey)"

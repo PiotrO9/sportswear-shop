@@ -2,7 +2,6 @@
 import type { CreateAdminProductInput } from '~/types/admin-product';
 import type {
     ProductCategory,
-    ProductColor,
     ProductMaterial,
     ProductSize,
 } from '~/types/product';
@@ -13,10 +12,16 @@ definePageMeta({
 
 const localePath = useLocalePath();
 const { addToast } = useToast();
-const { createProduct } = useAdminProducts();
+const { createProduct, getProductById, uploadVariantImage } =
+    useAdminProducts();
 
 const isSaving = ref(false);
 const formError = ref('');
+
+const frontImageFile = ref<File | null>(null);
+const backImageFile = ref<File | null>(null);
+const frontPreviewUrl = ref<string | null>(null);
+const backPreviewUrl = ref<string | null>(null);
 
 const name = ref('');
 const slug = ref('');
@@ -28,7 +33,6 @@ const subcategory = ref('');
 const material = ref<ProductMaterial>('cotton');
 const status = ref<'draft' | 'active' | 'archived'>('draft');
 const sizes = ref<ProductSize[]>(['M']);
-const colors = ref<ProductColor[]>(['black']);
 
 const categoryOptions: Array<{ value: ProductCategory; label: string }> = [
     { value: 'men', label: 'Mężczyźni' },
@@ -45,14 +49,6 @@ const materialOptions: Array<{ value: ProductMaterial; label: string }> = [
 ];
 
 const sizeOptions: ProductSize[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-const colorOptions: ProductColor[] = [
-    'black',
-    'white',
-    'grey',
-    'navy',
-    'red',
-    'blue',
-];
 
 const statusOptions: Array<{
     value: 'draft' | 'active' | 'archived';
@@ -63,9 +59,6 @@ const statusOptions: Array<{
     { value: 'archived', label: 'Archiwalny' },
 ];
 
-const generatedVariantsCount = computed(
-    () => sizes.value.length * colors.value.length,
-);
 const canSubmit = computed(() => {
     if (!name.value.trim() || !slug.value.trim() || !sku.value.trim()) {
         return false;
@@ -75,11 +68,7 @@ const canSubmit = computed(() => {
         return false;
     }
 
-    if (sizes.value.length === 0 || colors.value.length === 0) {
-        return false;
-    }
-
-    if (generatedVariantsCount.value === 0) {
+    if (sizes.value.length === 0) {
         return false;
     }
 
@@ -96,36 +85,19 @@ function handleToggleSize(size: ProductSize): void {
     sizes.value = [...sizes.value, size];
 }
 
-function handleToggleColor(color: ProductColor): void {
-    if (colors.value.includes(color)) {
-        colors.value = colors.value.filter((item) => item !== color);
-
-        return;
-    }
-
-    colors.value = [...colors.value, color];
-}
-
-function formatVariantSku(
-    baseSku: string,
-    sizeValue: ProductSize,
-    colorValue: ProductColor,
-): string {
-    return `${baseSku}-${sizeValue}-${colorValue}`.toUpperCase();
+function formatVariantSku(baseSku: string, sizeValue: ProductSize): string {
+    return `${baseSku}-${sizeValue}`.toUpperCase();
 }
 
 function buildCreatePayload(): CreateAdminProductInput {
     const normalizedPrice = Number(price.value);
-    const variants = sizes.value.flatMap((sizeValue) =>
-        colors.value.map((colorValue) => ({
-            size: sizeValue,
-            color: colorValue,
-            sku: formatVariantSku(sku.value.trim(), sizeValue, colorValue),
-            isActive: true,
-            quantity: 0,
-            lowStockThreshold: 3,
-        })),
-    );
+    const variants = sizes.value.map((sizeValue) => ({
+        size: sizeValue,
+        sku: formatVariantSku(sku.value.trim(), sizeValue),
+        isActive: true,
+        quantity: 0,
+        lowStockThreshold: 3,
+    }));
 
     return {
         name: name.value.trim(),
@@ -139,10 +111,45 @@ function buildCreatePayload(): CreateAdminProductInput {
         status: status.value,
         options: {
             sizes: sizes.value,
-            colors: colors.value,
         },
         variants,
     };
+}
+
+function revokePreview(url: string | null): void {
+    if (url) {
+        URL.revokeObjectURL(url);
+    }
+}
+
+function handleFrontImageChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    revokePreview(frontPreviewUrl.value);
+    frontImageFile.value = file;
+    frontPreviewUrl.value = file ? URL.createObjectURL(file) : null;
+}
+
+function handleBackImageChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    revokePreview(backPreviewUrl.value);
+    backImageFile.value = file;
+    backPreviewUrl.value = file ? URL.createObjectURL(file) : null;
+}
+
+function handleClearFrontImage(): void {
+    revokePreview(frontPreviewUrl.value);
+    frontPreviewUrl.value = null;
+    frontImageFile.value = null;
+}
+
+function handleClearBackImage(): void {
+    revokePreview(backPreviewUrl.value);
+    backPreviewUrl.value = null;
+    backImageFile.value = null;
 }
 
 function handleNameBlur(): void {
@@ -172,9 +179,44 @@ async function handleSubmit(): Promise<void> {
         const payload = buildCreatePayload();
         const created = await createProduct(payload);
 
+        const hasProductPhotos =
+            frontImageFile.value !== null || backImageFile.value !== null;
+
+        if (hasProductPhotos) {
+            const product = await getProductById(created.id);
+
+            for (const variant of product.variants) {
+                if (frontImageFile.value) {
+                    await uploadVariantImage(
+                        created.id,
+                        variant.id,
+                        frontImageFile.value,
+                        {
+                            alt: 'Przód produktu',
+                            isPrimary: true,
+                        },
+                    );
+                }
+
+                if (backImageFile.value) {
+                    await uploadVariantImage(
+                        created.id,
+                        variant.id,
+                        backImageFile.value,
+                        {
+                            alt: 'Tył produktu',
+                            isPrimary: false,
+                        },
+                    );
+                }
+            }
+        }
+
         addToast({
             title: 'Produkt utworzony',
-            description: `Utworzono produkt i ${payload.variants.length} wariantów.`,
+            description: hasProductPhotos
+                ? `Utworzono produkt, ${payload.variants.length} wariantów i wgrano zdjęcia do każdego wariantu.`
+                : `Utworzono produkt i ${payload.variants.length} wariantów.`,
             variant: 'success',
         });
 
@@ -194,12 +236,17 @@ async function handleSubmit(): Promise<void> {
         isSaving.value = false;
     }
 }
+
+onUnmounted(() => {
+    revokePreview(frontPreviewUrl.value);
+    revokePreview(backPreviewUrl.value);
+});
 </script>
 
 <template>
     <AdminPanelShell
         title="Dodaj produkt"
-        description="Utwórz nowy produkt, wybierz rozmiary i kolory, a system wygeneruje warianty."
+        description="Utwórz nowy produkt i wybierz rozmiary — każdy rozmiar to osobny wariant (SKU)."
     >
         <Card aria-label="Formularz nowego produktu">
             <div class="grid gap-4 md:grid-cols-2">
@@ -368,74 +415,149 @@ async function handleSubmit(): Promise<void> {
             </div>
         </Card>
 
-        <Card aria-label="Konfiguracja wariantów rozmiar i kolor">
+        <Card aria-label="Zdjęcia produktu — przód i tył">
             <template #header>
                 <p
                     class="text-secondary-900 dark:text-secondary-50 font-semibold"
                 >
-                    Warianty (rozmiar i kolor)
+                    Zdjęcia produktu
+                </p>
+                <p
+                    class="text-secondary-600 dark:text-secondary-400 mt-1 text-xs font-normal"
+                >
+                    Te same pliki zostaną przypisane do każdego wygenerowanego
+                    wariantu (przód — zdjęcie główne, tył — drugie). Opcjonalne
+                    przy tworzeniu; później możesz dodać więcej zdjęć w edycji
+                    produktu.
                 </p>
             </template>
 
-            <div class="grid gap-4 lg:grid-cols-2">
+            <div class="grid gap-6 sm:grid-cols-2">
                 <div class="space-y-2">
-                    <p
+                    <label
+                        for="adminNewProductImageFront"
                         class="text-secondary-700 dark:text-secondary-300 text-sm font-medium"
                     >
-                        Rozmiary
+                        Przód produktu
+                    </label>
+                    <input
+                        id="adminNewProductImageFront"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        class="text-secondary-800 dark:text-secondary-200 file:bg-primary-600 hover:file:bg-primary-700 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white"
+                        :disabled="isSaving"
+                        aria-describedby="adminNewProductImageFrontHint"
+                        @change="handleFrontImageChange"
+                    />
+                    <p
+                        id="adminNewProductImageFrontHint"
+                        class="text-secondary-500 dark:text-secondary-400 text-xs"
+                    >
+                        JPEG, PNG lub WebP.
                     </p>
-                    <div class="flex flex-wrap gap-2">
+                    <div
+                        v-if="frontPreviewUrl"
+                        class="border-secondary-200 dark:border-secondary-700 relative inline-block rounded-lg border"
+                    >
+                        <img
+                            :src="frontPreviewUrl"
+                            alt="Podgląd zdjęcia z przodu"
+                            class="h-32 w-32 object-cover"
+                        />
                         <button
-                            v-for="sizeValue in sizeOptions"
-                            :key="sizeValue"
                             type="button"
-                            class="rounded-lg border px-3 py-1.5 text-sm font-medium transition"
-                            :class="
-                                sizes.includes(sizeValue)
-                                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300'
-                                    : 'border-secondary-300 text-secondary-700 hover:bg-secondary-100 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800'
-                            "
-                            :aria-pressed="sizes.includes(sizeValue)"
-                            :aria-label="`Przełącz rozmiar ${sizeValue}`"
-                            @click="handleToggleSize(sizeValue)"
+                            class="bg-secondary-900/80 text-secondary-50 hover:bg-secondary-900 absolute top-1 right-1 rounded px-2 py-0.5 text-xs font-medium"
+                            tabindex="0"
+                            aria-label="Usuń wybrane zdjęcie przodu"
+                            @click="handleClearFrontImage"
+                            @keydown.enter.prevent="handleClearFrontImage"
+                            @keydown.space.prevent="handleClearFrontImage"
                         >
-                            {{ sizeValue }}
+                            Usuń
                         </button>
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <p
+                    <label
+                        for="adminNewProductImageBack"
                         class="text-secondary-700 dark:text-secondary-300 text-sm font-medium"
                     >
-                        Kolory
+                        Tył produktu
+                    </label>
+                    <input
+                        id="adminNewProductImageBack"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        class="text-secondary-800 dark:text-secondary-200 file:bg-primary-600 hover:file:bg-primary-700 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white"
+                        :disabled="isSaving"
+                        aria-describedby="adminNewProductImageBackHint"
+                        @change="handleBackImageChange"
+                    />
+                    <p
+                        id="adminNewProductImageBackHint"
+                        class="text-secondary-500 dark:text-secondary-400 text-xs"
+                    >
+                        JPEG, PNG lub WebP.
                     </p>
-                    <div class="flex flex-wrap gap-2">
+                    <div
+                        v-if="backPreviewUrl"
+                        class="border-secondary-200 dark:border-secondary-700 relative inline-block rounded-lg border"
+                    >
+                        <img
+                            :src="backPreviewUrl"
+                            alt="Podgląd zdjęcia z tyłu"
+                            class="h-32 w-32 object-cover"
+                        />
                         <button
-                            v-for="colorValue in colorOptions"
-                            :key="colorValue"
                             type="button"
-                            class="rounded-lg border px-3 py-1.5 text-sm font-medium capitalize transition"
-                            :class="
-                                colors.includes(colorValue)
-                                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300'
-                                    : 'border-secondary-300 text-secondary-700 hover:bg-secondary-100 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800'
-                            "
-                            :aria-pressed="colors.includes(colorValue)"
-                            :aria-label="`Przełącz kolor ${colorValue}`"
-                            @click="handleToggleColor(colorValue)"
+                            class="bg-secondary-900/80 text-secondary-50 hover:bg-secondary-900 absolute top-1 right-1 rounded px-2 py-0.5 text-xs font-medium"
+                            tabindex="0"
+                            aria-label="Usuń wybrane zdjęcie tyłu"
+                            @click="handleClearBackImage"
+                            @keydown.enter.prevent="handleClearBackImage"
+                            @keydown.space.prevent="handleClearBackImage"
                         >
-                            {{ colorValue }}
+                            Usuń
                         </button>
                     </div>
                 </div>
             </div>
+        </Card>
 
-            <div
-                class="bg-secondary-50 dark:bg-secondary-800/70 text-secondary-700 dark:text-secondary-200 mt-4 rounded-xl p-3 text-sm"
-            >
-                Wygenerowanych wariantów:
-                <strong>{{ generatedVariantsCount }}</strong>
+        <Card aria-label="Konfiguracja wariantów rozmiar">
+            <template #header>
+                <p
+                    class="text-secondary-900 dark:text-secondary-50 font-semibold"
+                >
+                    Warianty (rozmiar)
+                </p>
+            </template>
+
+            <div class="space-y-2">
+                <p
+                    class="text-secondary-700 dark:text-secondary-300 text-sm font-medium"
+                >
+                    Rozmiary
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        v-for="sizeValue in sizeOptions"
+                        :key="sizeValue"
+                        type="button"
+                        class="rounded-lg border px-3 py-1.5 text-sm font-medium transition"
+                        :class="
+                            sizes.includes(sizeValue)
+                                ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950/40 dark:text-primary-300'
+                                : 'border-secondary-300 text-secondary-700 hover:bg-secondary-100 dark:border-secondary-700 dark:text-secondary-300 dark:hover:bg-secondary-800'
+                        "
+                        :aria-pressed="sizes.includes(sizeValue)"
+                        :aria-label="`Przełącz rozmiar ${sizeValue}`"
+                        @click="handleToggleSize(sizeValue)"
+                    >
+                        {{ sizeValue }}
+                    </button>
+                </div>
             </div>
         </Card>
 

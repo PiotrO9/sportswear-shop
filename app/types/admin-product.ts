@@ -1,6 +1,5 @@
 import type {
     ProductCategory,
-    ProductColor,
     ProductMaterial,
     ProductSize,
 } from '~/types/product';
@@ -9,7 +8,6 @@ export type AdminProductStatus = 'draft' | 'active' | 'archived';
 
 export interface ProductOptionSet {
     sizes: ProductSize[];
-    colors: ProductColor[];
 }
 
 export interface ProductVariantImage {
@@ -22,11 +20,19 @@ export interface ProductVariantImage {
     createdAt?: string;
 }
 
+export interface AdminVariantImageUploadResponse {
+    id: string;
+    url: string;
+    storagePath: string;
+    alt: string | null;
+    isPrimary: boolean;
+    order: number;
+}
+
 export interface ProductVariant {
     id: string;
     productId: string;
     size: ProductSize;
-    color: ProductColor;
     sku: string;
     priceOverride: number | null;
     isActive: boolean;
@@ -87,7 +93,6 @@ export interface AdminProductsQuery {
 
 export interface CreateProductVariantInput {
     size: ProductSize;
-    color: ProductColor;
     sku: string;
     priceOverride?: number | null;
     isActive?: boolean;

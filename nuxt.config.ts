@@ -47,6 +47,12 @@ export default defineNuxtConfig({
         name: 'Frontend Starter',
     },
     runtimeConfig: {
+        productImagesBucket:
+            process.env.SUPABASE_STORAGE_PRODUCT_BUCKET || 'product-images',
+        productImageMaxBytes: Number(
+            process.env.SUPABASE_STORAGE_PRODUCT_IMAGE_MAX_BYTES ||
+                String(5 * 1024 * 1024),
+        ),
         public: {
             apiBase: process.env.NUXT_PUBLIC_API_BASE || '',
             siteUrl:

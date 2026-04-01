@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import type {
-    Product,
-    ProductColor,
-    ProductMaterial,
-    ProductSize,
-} from '~/types/product';
+import type { Product, ProductMaterial, ProductSize } from '~/types/product';
 
 interface Props {
     product: Product;
@@ -18,16 +13,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    (
-        e: 'add-to-cart',
-        payload: { product: Product; size: ProductSize; color: ProductColor },
-    ): void;
+    (e: 'add-to-cart', payload: { product: Product; size: ProductSize }): void;
 }>();
 
 const { t } = useI18n();
 
 const selectedSize = ref<ProductSize | null>(null);
-const selectedColor = ref<ProductColor | null>(null);
 
 const sizeLabelKeyMap: Record<ProductSize, string> = {
     XS: 'creatorOptionXs',
@@ -36,15 +27,6 @@ const sizeLabelKeyMap: Record<ProductSize, string> = {
     L: 'creatorOptionL',
     XL: 'creatorOptionXl',
     XXL: 'creatorOptionXxl',
-};
-
-const colorClassMap: Record<ProductColor, string> = {
-    black: 'bg-black',
-    white: 'bg-white ring-1 ring-secondary-300 dark:ring-secondary-600',
-    grey: 'bg-gray-400',
-    navy: 'bg-blue-900',
-    red: 'bg-red-500',
-    blue: 'bg-blue-500',
 };
 
 const materialLabelKeyMap: Record<ProductMaterial, string> = {
@@ -61,16 +43,6 @@ const categoryLabelKeyMap: Record<Product['category'], string> = {
     sport: 'navSport',
 };
 
-onMounted(() => {
-    if (props.product.sizes.length > 0 && !selectedSize.value) {
-        selectedSize.value = props.product.sizes[0] ?? null;
-    }
-
-    if (props.product.colors.length > 0 && !selectedColor.value) {
-        selectedColor.value = props.product.colors[0] ?? null;
-    }
-});
-
 watch(
     () => props.product,
     (product) => {
@@ -80,14 +52,6 @@ watch(
                 !product.sizes.includes(selectedSize.value))
         ) {
             selectedSize.value = product.sizes[0] ?? null;
-        }
-
-        if (
-            product.colors.length > 0 &&
-            (selectedColor.value === null ||
-                !product.colors.includes(selectedColor.value))
-        ) {
-            selectedColor.value = product.colors[0] ?? null;
         }
     },
     { immediate: true },
@@ -104,24 +68,12 @@ function handleSizeKeyDown(event: KeyboardEvent, size: ProductSize) {
     handleSizeSelect(size);
 }
 
-function handleColorSelect(color: ProductColor) {
-    selectedColor.value = color;
-}
-
-function handleColorKeyDown(event: KeyboardEvent, color: ProductColor) {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-
-    event.preventDefault();
-    handleColorSelect(color);
-}
-
 function handleAddToCart() {
-    if (!selectedSize.value || !selectedColor.value) return;
+    if (!selectedSize.value) return;
 
     emit('add-to-cart', {
         product: props.product,
         size: selectedSize.value,
-        color: selectedColor.value,
     });
 }
 
@@ -175,45 +127,6 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
             </div>
         </div>
 
-        <div v-if="product.colors.length > 0" class="flex flex-col gap-1.5">
-            <span
-                class="text-secondary-600 dark:text-secondary-400 font-medium"
-                :class="compact ? 'text-xs' : 'text-sm'"
-            >
-                {{ t('productCardColor') }}
-            </span>
-            <div
-                class="flex flex-wrap gap-2"
-                role="group"
-                :aria-label="t('productCardColorAria')"
-            >
-                <button
-                    v-for="color in product.colors"
-                    :key="color"
-                    type="button"
-                    class="focus-visible:ring-primary-500 cursor-pointer rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                    :class="[
-                        compact ? 'size-6' : 'size-8',
-                        colorClassMap[color],
-                        selectedColor === color
-                            ? 'ring-primary-500 dark:ring-primary-400 ring-2 ring-offset-2'
-                            : 'ring-secondary-300 hover:ring-secondary-400 dark:ring-secondary-600 dark:hover:ring-secondary-500 ring-1',
-                    ]"
-                    :aria-label="
-                        t('productCardColorOptionAria', {
-                            color: t(
-                                `creatorOption${color.charAt(0).toUpperCase() + color.slice(1)}`,
-                            ),
-                        })
-                    "
-                    :aria-pressed="selectedColor === color"
-                    tabindex="0"
-                    @click="handleColorSelect(color)"
-                    @keydown="handleColorKeyDown($event, color)"
-                />
-            </div>
-        </div>
-
         <div
             class="text-secondary-500 dark:text-secondary-400 flex flex-wrap gap-x-3 gap-y-1"
             :class="compact ? 'text-xs' : 'text-sm'"
@@ -247,7 +160,7 @@ function handleAddToCartKeyDown(event: KeyboardEvent) {
                 type="button"
                 class="bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-700 inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg font-medium text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 :class="compact ? 'px-3 py-2 text-sm' : 'px-4 py-3 text-base'"
-                :disabled="!selectedSize || !selectedColor"
+                :disabled="!selectedSize"
                 :aria-label="
                     t('productCardAddToCartAria', { name: product.name })
                 "

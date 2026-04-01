@@ -2,7 +2,6 @@
 import ProductCard from '~/components/shop/ProductCard.vue';
 import type {
     ProductCategory,
-    ProductColor,
     ProductMaterial,
     ProductSize,
     ProductSort,
@@ -27,7 +26,6 @@ const filterMinPrice = ref<string>('0');
 const filterMaxPrice = ref<string>('500');
 const filterSize = ref<ProductSize | null>(null);
 const filterMaterial = ref<ProductMaterial | 'all'>('all');
-const filterColor = ref<ProductColor | 'all'>('all');
 const filterSort = ref<ProductSort>('price-asc');
 const currentPage = ref(1);
 const isFiltersDrawerOpen = ref(false);
@@ -41,7 +39,6 @@ const filteredProducts = computed(() =>
         Number.parseFloat(filterMaxPrice.value) || 500,
         filterSize.value,
         filterMaterial.value,
-        filterColor.value,
         filterSort.value,
         props.initialSubcategory,
     ),
@@ -71,7 +68,6 @@ watch(
         filterMaxPrice,
         filterSize,
         filterMaterial,
-        filterColor,
         filterSort,
     ],
     () => {
@@ -85,7 +81,6 @@ function handleResetFilters() {
     filterMaxPrice.value = '500';
     filterSize.value = null;
     filterMaterial.value = 'all';
-    filterColor.value = 'all';
     filterSort.value = 'price-asc';
 }
 
@@ -144,11 +139,7 @@ function handleNextKeyDown(event: KeyboardEvent) {
     handleNextPage();
 }
 
-function handleAddToCart(payload: {
-    product: { name: string };
-    size: string;
-    color: string;
-}) {
+function handleAddToCart(payload: { product: { name: string }; size: string }) {
     addToast({
         title: t('productCardAddedToCart'),
         description: t('productCardAddedToCartDesc', {
@@ -196,7 +187,6 @@ function handleAddToCart(payload: {
                     v-model:filter-max-price="filterMaxPrice"
                     v-model:filter-size="filterSize"
                     v-model:filter-material="filterMaterial"
-                    v-model:filter-color="filterColor"
                     v-model:filter-sort="filterSort"
                     id-prefix="filter-desktop"
                     :compact="true"
@@ -214,7 +204,6 @@ function handleAddToCart(payload: {
                     v-model:filter-max-price="filterMaxPrice"
                     v-model:filter-size="filterSize"
                     v-model:filter-material="filterMaterial"
-                    v-model:filter-color="filterColor"
                     v-model:filter-sort="filterSort"
                     id-prefix="filter-mobile"
                     :hide-title="true"
